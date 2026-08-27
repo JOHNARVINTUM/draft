@@ -1,0 +1,12 @@
+﻿/*
+Theme Name: DRAFT Theme
+Theme URI: https://draftmagazine.ph/
+Author: Big Picture Asia Inc.
+Description: Custom WordPress theme shell for DRAFT Magazine.
+Version: 0.1.0
+Text Domain: draft-theme
+Requires at least: 6.0
+Requires PHP: 7.4
+*/
+
+@import url('./assets/css/theme.css');

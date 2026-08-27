@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRAFT — Magazine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400;1,500;1,700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Cactus+Classical+Serif&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+body { font-family: 'Inter', sans-serif; background: #FAFAF8; color: #111; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+:root { --primary: #045350; --container-lg: 1320px; }
+
+/* ── SHARED ── */
+.dr-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+.dr-navbar-bar { background: var(--primary); padding: 18px 40px 14px; }
+.dr-navbar-inner { max-width: var(--container-lg); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+.dr-navbar-logo img { height: 52px; width: auto; filter: brightness(0) saturate(0) invert(1); opacity: .95; }
+.dr-nav-links { display: flex; align-items: center; gap: 40px; }
+.dr-nav-links a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.58); border-bottom: 1.5px solid transparent; padding-bottom: 2px; transition: color .2s; }
+.dr-nav-links a:hover, .dr-nav-links a.active { color: #fff; }
+.dr-nav-links a.active { font-weight: 800; border-bottom-color: rgba(255,255,255,.6); }
+.dr-hamburger { display: none; position: absolute; right: 0; top: 0; color: #fff; padding: 4px; }
+.dr-spacer { height: 86px; }
+.dr-mobile-menu { display: none; position: fixed; inset: 0; z-index: 49; background: var(--primary); padding-top: 86px; }
+.dr-mobile-menu.open { display: block; }
+.dr-mobile-menu nav { padding: 32px; display: flex; flex-direction: column; }
+.dr-mobile-menu nav a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 700; color: rgba(255,255,255,.6); padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,.1); transition: color .2s; }
+.dr-mobile-menu nav a:last-child { border-bottom: none; }
+.dr-mobile-menu nav a.active { color: #fff; }
+.dr-footer { background: var(--primary); color: #fff; }
+.dr-footer-hairline { padding: 60px; }
+.dr-footer-hairline-line { display: flex; align-items: center; }
+.dr-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.55); flex-shrink: 0; }
+.dr-footer-rule { flex: 1; height: 1px; background: rgba(255,255,255,.3); }
+.dr-footer-body { max-width: 1440px; margin: 0 auto; padding: 64px 56px 72px; display: grid; grid-template-columns: 42% 58%; align-items: start; }
+.dr-footer-left { display: flex; flex-direction: column; align-items: flex-start; }
+.dr-footer-icon { height: 200px; width: auto; filter: brightness(0) invert(1); margin-bottom: 15px; }
+.dr-footer-tagline { font-family: 'Cactus Classical Serif', 'PT Serif', serif; font-size: 22px; font-weight: 700; font-style: italic; color: #fff; margin: 0 0 3px; line-height: 1.2; }
+.dr-footer-sub { font-family: 'PT Serif', serif; font-size: 13px; font-style: italic; color: rgba(255,255,255,.5); }
+.dr-footer-right { display: grid; grid-template-columns: 1fr 1fr 1.1fr; }
+.dr-footer-col-head { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #fff; margin: 0 0 18px; }
+.dr-footer-col-links { display: flex; flex-direction: column; gap: 11px; }
+.dr-footer-col-links a { font-family: 'PT Serif', serif; font-size: 15px; color: rgba(255,255,255,.72); transition: color .15s; }
+.dr-footer-col-links a:hover { color: #fff; }
+.dr-footer-socials { display: flex; flex-direction: column; gap: 14px; }
+.dr-footer-social-item { display: flex; align-items: center; gap: 11px; }
+.dr-footer-social-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.dr-footer-social-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; }
+.dr-footer-social-handle { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,.42); }
+.dr-social-sidebar { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; background: rgba(240,242,242,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 40px; box-shadow: 0 4px 24px rgba(0,0,0,.10); opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.dr-social-sidebar.visible { opacity: 1; pointer-events: auto; }
+.dr-social-sidebar a { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.08); transition: background .2s, color .2s, box-shadow .2s; }
+.dr-social-sidebar a:hover { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(4,83,80,.35); }
+
+/* ── MAGAZINES PAGE ── */
+.dr-mag-hero { padding: 56px 0 36px; }
+.dr-mag-hero-inner { max-width: var(--container-lg); margin: 0 auto; padding: 0 40px; text-align: center; }
+.dr-mag-hero-logo { height: 36px; width: auto; display: inline-block; margin-bottom: 6px; }
+.dr-mag-h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(28px, 4vw, 48px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--primary); line-height: 1; margin-bottom: 40px; }
+
+/* ── STACKED CAROUSEL ── */
+.dr-carousel-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.dr-carousel-stack { position: relative; width: 230px; height: 322px; }
+.dr-carousel-slide {
+  position: absolute; inset: 0;
+  transition: transform .6s cubic-bezier(.22,1,.36,1), opacity .6s ease, filter .6s ease;
+}
+.dr-carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+.dr-carousel-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 50; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid #111; background: #FAFAF8;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .25s, border-color .25s;
+}
+.dr-carousel-btn:hover { background: var(--primary); border-color: var(--primary); }
+.dr-carousel-btn:hover svg { stroke: #fff; }
+.dr-carousel-btn svg { stroke: #111; transition: stroke .25s; }
+.dr-carousel-btn.prev { left: 0; }
+.dr-carousel-btn.next { right: 0; }
+.dr-carousel-dots { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 22px; }
+.dr-carousel-dot { height: 7px; border-radius: 4px; border: none; padding: 0; cursor: pointer; background: #D8D8D2; transition: width .4s cubic-bezier(.22,1,.36,1), background-color .3s ease; }
+.dr-carousel-dot.active { width: 26px; background: var(--primary); }
+.dr-carousel-dot:not(.active) { width: 7px; }
+
+/* ── DIVIDER ── */
+.dr-divider-line { height: 1px; background: #E4E4DE; max-width: var(--container-lg); margin: 0 auto; }
+
+/* ── ISSUE GRID ── */
+.dr-issue-grid-section { padding: 48px 0 100px; }
+.dr-issue-grid-inner { max-width: var(--container-lg); margin: 0 auto; padding: 0 40px; }
+.dr-issue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 56px 32px; }
+.dr-issue-card { cursor: pointer; }
+.dr-issue-img-wrap { overflow: hidden; background: #E4E4DF; position: relative; aspect-ratio: 3/4; box-shadow: 0 2px 16px rgba(0,0,0,.07); margin-bottom: 16px; transition: box-shadow .45s ease; }
+.dr-issue-card:hover .dr-issue-img-wrap { box-shadow: 0 24px 64px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.08); }
+.dr-issue-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .65s cubic-bezier(.25,.46,.45,.94); }
+.dr-issue-card:hover .dr-issue-img-wrap img { transform: scale(1.05); }
+.dr-issue-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: var(--primary); line-height: 1.25; margin-bottom: 6px; transition: opacity .25s; }
+.dr-issue-card:hover .dr-issue-title { opacity: .75; }
+.dr-issue-sub { font-family: 'Inter', sans-serif; font-size: 12px; color: #888; line-height: 1.6; max-width: 260px; }
+
+@media (max-width: 768px) {
+  .dr-nav-links { display: none; }
+  .dr-hamburger { display: flex; }
+  .dr-footer-body { grid-template-columns: 1fr; }
+  .dr-footer-right { margin-top: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="dr-spacer"></div>
+<nav class="dr-navbar">
+  <div class="dr-navbar-bar">
+    <div class="dr-navbar-inner">
+      <a href="index.html" class="dr-navbar-logo"><img src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="DRAFT" /></a>
+      <div class="dr-nav-links">
+        <a href="index.html">Home</a>
+        <a href="covers.html">Covers</a>
+        <a href="magazines.html" class="active">Magazine</a>
+        <a href="articles.html">Articles</a>
+        <a href="about.html">About Us</a>
+      </div>
+      <button class="dr-hamburger" id="dr-hamburger" aria-label="Toggle menu">
+        <svg id="dr-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="dr-close-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="dr-mobile-menu" id="dr-mobile-menu">
+  <nav>
+    <a href="index.html">Home</a><a href="covers.html">Covers</a>
+    <a href="magazines.html" class="active">Magazine</a>
+    <a href="articles.html">Articles</a><a href="about.html">About Us</a>
+  </nav>
+</div>
+
+<!-- ── PAGE HERO ── -->
+<div class="dr-mag-hero">
+  <div class="dr-mag-hero-inner">
+    <img class="dr-mag-hero-logo" src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="draft" />
+    <h1 class="dr-mag-h1">MAGAZINE</h1>
+
+    <!-- Carousel -->
+    <div class="dr-carousel-wrap">
+      <button class="dr-carousel-btn prev" id="dr-prev" aria-label="Previous cover">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="dr-carousel-stack" id="dr-stack"></div>
+      <button class="dr-carousel-btn next" id="dr-next" aria-label="Next cover">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="dr-carousel-dots" id="dr-dots"></div>
+  </div>
+</div>
+
+<div style="padding:0 40px"><div class="dr-divider-line"></div></div>
+
+<!-- ── ISSUE GRID ── -->
+<div class="dr-issue-grid-section">
+  <div class="dr-issue-grid-inner">
+    <div class="dr-issue-grid" id="dr-issue-grid"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="dr-footer">
+  <div class="dr-footer-hairline"><div class="dr-footer-hairline-line"><div class="dr-footer-dot"></div><div class="dr-footer-rule"></div><div class="dr-footer-dot"></div></div></div>
+  <div class="dr-footer-body">
+    <div class="dr-footer-left">
+      <img class="dr-footer-icon" src="../src/imports/draft_icon-2.png" alt="DRAFT" />
+      <p class="dr-footer-tagline">Where the Boys Play</p>
+      <p class="dr-footer-sub">The modern voice of fashion, business &amp; lifestyle.</p>
+    </div>
+    <div class="dr-footer-right">
+      <div><p class="dr-footer-col-head">Navigate</p><div class="dr-footer-col-links"><a href="index.html">Home</a><a href="covers.html">Covers</a><a href="magazines.html">Magazine</a><a href="articles.html">Articles</a><a href="about.html">About Us</a></div></div>
+      <div><p class="dr-footer-col-head">Categories</p><div class="dr-footer-col-links"><a href="articles.html?category=Fashion">Fashion</a><a href="articles.html?category=Beauty">Beauty</a><a href="articles.html?category=Business">Business</a><a href="articles.html?category=Sports">Sports</a><a href="articles.html?category=Lifestyle">Lifestyle</a></div></div>
+      <div><p class="dr-footer-col-head">Follow Us</p><div class="dr-footer-socials">
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div><div><div class="dr-footer-social-name">Facebook</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div><div><div class="dr-footer-social-name">Instagram</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg></div><div><div class="dr-footer-social-name">TikTok</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+      </div></div>
+    </div>
+  </div>
+</footer>
+
+<div class="dr-social-sidebar" id="dr-social-sidebar">
+  <a href="https://facebook.com/draftmagazine" target="_blank" rel="noopener" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+  <a href="https://instagram.com/draft.mag" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+  <a href="https://tiktok.com/@draftmag" target="_blank" rel="noopener" aria-label="TikTok"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg></a>
+</div>
+
+<script>
+(function() {
+
+  // ============================================================
+  // CMS DATA — Update magazine issues here
+  // ============================================================
+  var ISSUES = [
+    { id:'12', title:'The Power Issue',     subtitle:'Redefining Influence in the Modern Age',   date:'June 2026',     coverImage:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=840&fit=crop&auto=format' },
+    { id:'11', title:'The Beauty Issue',    subtitle:'Science, Skin & the Future of Glow',        date:'May 2026',      coverImage:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=840&fit=crop&auto=format' },
+    { id:'10', title:'The Sports Issue',    subtitle:'Bodies, Minds & the Pursuit of Excellence', date:'April 2026',    coverImage:'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=840&fit=crop&auto=format' },
+    { id:'09', title:'The Fashion Issue',   subtitle:'What We Wear & Who We Become',              date:'March 2026',    coverImage:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=840&fit=crop&auto=format' },
+    { id:'08', title:'The Business Issue',  subtitle:'Capital, Culture & the New Economy',        date:'February 2026', coverImage:'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=840&fit=crop&auto=format' },
+    { id:'07', title:'The Lifestyle Issue', subtitle:'Slowing Down to Live More',                 date:'January 2026',  coverImage:'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=600&h=840&fit=crop&auto=format' },
+    { id:'06', title:'The Art Issue',       subtitle:'Creativity Without Borders',                date:'October 2025',  coverImage:'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&h=840&fit=crop&auto=format' },
+    { id:'05', title:'The Identity Issue',  subtitle:'Who We Are When No One Is Watching',        date:'September 2025',coverImage:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=840&fit=crop&auto=format' },
+    { id:'04', title:'The Travel Issue',    subtitle:'Places That Change You',                    date:'August 2025',   coverImage:'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&h=840&fit=crop&auto=format' }
+  ];
+  // ============================================================
+
+  // ── Stacked carousel ──
+  var CARD_W = 230, CARD_H = 322, STEP = 168;
+  var SIDE_SCALE = 0.84, FAR_SCALE = 0.70;
+  var current = 0;
+  var len = ISSUES.length;
+
+  function shortestOffset(index, cur, length) {
+    var raw = index - cur;
+    if (raw > length / 2) raw -= length;
+    if (raw < -length / 2) raw += length;
+    return raw;
+  }
+
+  function renderCarousel() {
+    var stack = document.getElementById('dr-stack');
+    var dots = document.getElementById('dr-dots');
+    stack.innerHTML = '';
+    dots.innerHTML = '';
+
+    ISSUES.forEach(function(slide, i) {
+      var offset = shortestOffset(i, current, len);
+      var abs = Math.abs(offset);
+      if (abs > 2) return;
+      var scale = offset === 0 ? 1 : abs === 1 ? SIDE_SCALE : FAR_SCALE;
+      var tx = offset * STEP;
+      var zIndex = 30 - abs * 10;
+      var brightness = offset === 0 ? 1 : 0.72;
+      var shadow = offset === 0
+        ? '0 30px 70px rgba(0,0,0,.28), 0 8px 24px rgba(0,0,0,.12)'
+        : '0 12px 30px rgba(0,0,0,.18)';
+
+      var el = document.createElement('div');
+      el.className = 'dr-carousel-slide';
+      el.style.cssText = [
+        'transform: translateX(' + tx + 'px) scale(' + scale + ')',
+        'z-index: ' + zIndex,
+        'opacity: 1',
+        'filter: brightness(' + brightness + ')',
+        'box-shadow: ' + shadow,
+        'cursor: ' + (offset === 0 ? 'default' : 'pointer')
+      ].join(';');
+
+      var img = document.createElement('img');
+      img.src = slide.coverImage;
+      img.alt = slide.title;
+      img.draggable = false;
+      el.appendChild(img);
+
+      if (offset !== 0) {
+        el.addEventListener('click', function() {
+          current = ((i % len) + len) % len;
+          renderCarousel();
+        });
+      }
+      stack.appendChild(el);
+    });
+
+    ISSUES.forEach(function(_, i) {
+      var dot = document.createElement('button');
+      dot.className = 'dr-carousel-dot' + (i === current ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to issue ' + (i + 1));
+      dot.addEventListener('click', function() { current = i; renderCarousel(); });
+      dots.appendChild(dot);
+    });
+  }
+
+  document.getElementById('dr-prev').addEventListener('click', function() {
+    current = ((current - 1) % len + len) % len;
+    renderCarousel();
+  });
+  document.getElementById('dr-next').addEventListener('click', function() {
+    current = (current + 1) % len;
+    renderCarousel();
+  });
+  renderCarousel();
+
+  // ── Issue grid ──
+  var grid = document.getElementById('dr-issue-grid');
+  ISSUES.forEach(function(issue, index) {
+    grid.innerHTML +=
+      '<div class="dr-issue-card">' +
+        '<div class="dr-issue-img-wrap"><img src="' + issue.coverImage + '" alt="' + issue.title + '" loading="lazy" /></div>' +
+        '<h3 class="dr-issue-title">Magazine ' + (index + 1) + '</h3>' +
+        '<p class="dr-issue-sub">' + issue.subtitle + '</p>' +
+      '</div>';
+  });
+
+  // Mobile menu
+  var hamburger = document.getElementById('dr-hamburger');
+  var mobileMenu = document.getElementById('dr-mobile-menu');
+  var menuIcon = document.getElementById('dr-menu-icon');
+  var closeIcon = document.getElementById('dr-close-icon');
+  var isOpen = false;
+  hamburger.addEventListener('click', function() {
+    isOpen = !isOpen;
+    mobileMenu.classList.toggle('open', isOpen);
+    menuIcon.style.display = isOpen ? 'none' : 'block';
+    closeIcon.style.display = isOpen ? 'block' : 'none';
+  });
+
+  // Social sidebar
+  var sidebar = document.getElementById('dr-social-sidebar');
+  window.addEventListener('scroll', function() {
+    sidebar.classList.toggle('visible', window.scrollY > 120);
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>

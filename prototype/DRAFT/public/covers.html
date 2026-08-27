@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRAFT — The Covers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400;1,500;1,700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Cactus+Classical+Serif&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+body { font-family: 'Inter', sans-serif; background: #FAFAF8; color: #111111; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+:root {
+  --primary: #045350;
+  --bg: #FAFAF8;
+  --fg: #111111;
+  --border: #E4E4DE;
+  --container-lg: 1320px;
+  --pad: 40px;
+}
+
+/* ── NAVBAR ── */
+.dr-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+.dr-navbar-bar { background: var(--primary); padding: 18px 40px 14px; }
+.dr-navbar-inner { max-width: var(--container-lg); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+.dr-navbar-logo img { height: 52px; width: auto; filter: brightness(0) saturate(0) invert(1); opacity: .95; }
+.dr-nav-links { display: flex; align-items: center; gap: 40px; }
+.dr-nav-links a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.58); border-bottom: 1.5px solid transparent; padding-bottom: 2px; transition: color .2s; }
+.dr-nav-links a:hover, .dr-nav-links a.active { color: #fff; }
+.dr-nav-links a.active { font-weight: 800; border-bottom-color: rgba(255,255,255,.6); }
+.dr-hamburger { display: none; position: absolute; right: 0; top: 0; color: #fff; padding: 4px; }
+.dr-spacer { height: 86px; }
+.dr-mobile-menu { display: none; position: fixed; inset: 0; z-index: 49; background: var(--primary); padding-top: 86px; }
+.dr-mobile-menu.open { display: block; }
+.dr-mobile-menu nav { padding: 32px; display: flex; flex-direction: column; }
+.dr-mobile-menu nav a { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 700; color: rgba(255,255,255,.6); padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,.1); transition: color .2s; }
+.dr-mobile-menu nav a:last-child { border-bottom: none; }
+.dr-mobile-menu nav a.active { color: #fff; }
+
+/* ── FOOTER ── */
+.dr-footer { background: var(--primary); color: #fff; }
+.dr-footer-hairline { padding: 60px; }
+.dr-footer-hairline-line { display: flex; align-items: center; }
+.dr-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.55); flex-shrink: 0; }
+.dr-footer-rule { flex: 1; height: 1px; background: rgba(255,255,255,.3); }
+.dr-footer-body { max-width: 1440px; margin: 0 auto; padding: 64px 56px 72px; display: grid; grid-template-columns: 42% 58%; align-items: start; }
+.dr-footer-left { display: flex; flex-direction: column; align-items: flex-start; }
+.dr-footer-icon { height: 200px; width: auto; filter: brightness(0) invert(1); margin-bottom: 15px; }
+.dr-footer-tagline { font-family: 'Cactus Classical Serif', 'PT Serif', serif; font-size: 22px; font-weight: 700; font-style: italic; color: #fff; margin: 0 0 3px; line-height: 1.2; }
+.dr-footer-sub { font-family: 'PT Serif', serif; font-size: 13px; font-style: italic; color: rgba(255,255,255,.5); line-height: 1.55; }
+.dr-footer-right { display: grid; grid-template-columns: 1fr 1fr 1.1fr; }
+.dr-footer-col-head { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #fff; margin: 0 0 18px; }
+.dr-footer-col-links { display: flex; flex-direction: column; gap: 11px; }
+.dr-footer-col-links a { font-family: 'PT Serif', serif; font-size: 15px; color: rgba(255,255,255,.72); transition: color .15s; }
+.dr-footer-col-links a:hover { color: #fff; }
+.dr-footer-socials { display: flex; flex-direction: column; gap: 14px; }
+.dr-footer-social-item { display: flex; align-items: center; gap: 11px; }
+.dr-footer-social-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.dr-footer-social-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; line-height: 1.25; }
+.dr-footer-social-handle { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,.42); margin-top: 1px; }
+
+/* ── SOCIAL SIDEBAR ── */
+.dr-social-sidebar { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px; background: rgba(240,242,242,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 40px; box-shadow: 0 4px 24px rgba(0,0,0,.10); opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.dr-social-sidebar.visible { opacity: 1; pointer-events: auto; }
+.dr-social-sidebar a { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.08); transition: background .2s, color .2s, box-shadow .2s; }
+.dr-social-sidebar a:hover { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(4,83,80,.35); }
+
+/* ── COVERS PAGE ── */
+.dr-covers-hero-section { padding: 64px 0 40px; }
+.dr-covers-hero-inner { max-width: var(--container-lg); margin: 0 auto; padding: 0 40px; display: grid; grid-template-columns: 1fr auto; align-items: flex-end; gap: 32px; }
+.dr-covers-h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 800; letter-spacing: -.03em; color: #111; line-height: 1.05; margin-bottom: 16px; }
+.dr-covers-intro { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 300; color: #777; line-height: 1.7; max-width: 480px; letter-spacing: .01em; }
+.dr-current-edition-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--primary); margin-bottom: 6px; }
+.dr-current-edition-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--primary); }
+.dr-divider { height: 1px; background: var(--border); max-width: var(--container-lg); margin: 0 auto; padding: 0 40px; }
+.dr-divider-line { height: 1px; background: var(--border); }
+
+/* Cover Grid */
+.dr-cover-grid-section { padding: 48px 0 100px; }
+.dr-cover-grid-inner { max-width: var(--container-lg); margin: 0 auto; padding: 0 40px; }
+.dr-cover-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 48px 32px; }
+
+/* Cover Card */
+.dr-cover-card { cursor: pointer; }
+.dr-cover-img-wrap { overflow: hidden; background: #E4E4DF; position: relative; aspect-ratio: 3/4; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 16px; transition: box-shadow .45s ease; }
+.dr-cover-card:hover .dr-cover-img-wrap { box-shadow: 0 20px 60px rgba(0,0,0,.16), 0 4px 16px rgba(0,0,0,.08); }
+.dr-cover-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.25,.46,.45,.94); }
+.dr-cover-card:hover .dr-cover-img-wrap img { transform: scale(1.04); }
+.dr-cover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.38); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .35s ease; }
+.dr-cover-card:hover .dr-cover-overlay { opacity: 1; }
+.dr-cover-view-btn { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #fff; border: 1px solid rgba(255,255,255,.6); padding: 10px 22px; transform: translateY(6px); transition: transform .35s ease; }
+.dr-cover-card:hover .dr-cover-view-btn { transform: translateY(0); }
+.dr-cover-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.dr-cover-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: #111; line-height: 1.25; transition: color .25s; }
+.dr-cover-card:hover .dr-cover-title { color: var(--primary); }
+.dr-cover-type { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 3px 7px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+.dr-cover-sub { font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #aaa; }
+
+@media (max-width: 768px) {
+  .dr-nav-links { display: none; }
+  .dr-hamburger { display: flex; }
+  .dr-covers-hero-inner { grid-template-columns: 1fr; }
+  .dr-footer-body { grid-template-columns: 1fr; }
+  .dr-footer-right { margin-top: 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="dr-spacer"></div>
+<nav class="dr-navbar">
+  <div class="dr-navbar-bar">
+    <div class="dr-navbar-inner">
+      <a href="index.html" class="dr-navbar-logo"><img src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="DRAFT" /></a>
+      <div class="dr-nav-links">
+        <a href="index.html">Home</a>
+        <a href="covers.html" class="active">Covers</a>
+        <a href="magazines.html">Magazine</a>
+        <a href="articles.html">Articles</a>
+        <a href="about.html">About Us</a>
+      </div>
+      <button class="dr-hamburger" id="dr-hamburger" aria-label="Toggle menu">
+        <svg id="dr-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="dr-close-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="dr-mobile-menu" id="dr-mobile-menu">
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="covers.html" class="active">Covers</a>
+    <a href="magazines.html">Magazine</a>
+    <a href="articles.html">Articles</a>
+    <a href="about.html">About Us</a>
+  </nav>
+</div>
+
+<!-- ── PAGE HERO ── -->
+<div class="dr-covers-hero-section">
+  <div class="dr-covers-hero-inner">
+    <div>
+      <h1 class="dr-covers-h1">The Covers</h1>
+      <p class="dr-covers-intro">A curated archive of visual narratives. Explore the evolution of DRAFT through our definitive collection of printed editions and special digital releases.</p>
+    </div>
+    <div style="text-align:right;padding-bottom:4px">
+      <div class="dr-current-edition-label">Current Edition</div>
+      <div class="dr-current-edition-val">Spring/Summer 2024</div>
+    </div>
+  </div>
+</div>
+<div style="max-width:1320px;margin:0 auto;padding:0 40px"><div class="dr-divider-line"></div></div>
+
+<!-- ── COVER GRID ── -->
+<div class="dr-cover-grid-section">
+  <div class="dr-cover-grid-inner">
+    <div class="dr-cover-grid" id="dr-cover-grid"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer class="dr-footer">
+  <div class="dr-footer-hairline"><div class="dr-footer-hairline-line"><div class="dr-footer-dot"></div><div class="dr-footer-rule"></div><div class="dr-footer-dot"></div></div></div>
+  <div class="dr-footer-body">
+    <div class="dr-footer-left">
+      <img class="dr-footer-icon" src="../src/imports/draft_icon-2.png" alt="DRAFT" />
+      <p class="dr-footer-tagline">Where the Boys Play</p>
+      <p class="dr-footer-sub">The modern voice of fashion, business &amp; lifestyle.</p>
+    </div>
+    <div class="dr-footer-right">
+      <div><p class="dr-footer-col-head">Navigate</p><div class="dr-footer-col-links"><a href="index.html">Home</a><a href="covers.html">Covers</a><a href="magazines.html">Magazine</a><a href="articles.html">Articles</a><a href="about.html">About Us</a></div></div>
+      <div><p class="dr-footer-col-head">Categories</p><div class="dr-footer-col-links"><a href="articles.html?category=Fashion">Fashion</a><a href="articles.html?category=Beauty">Beauty</a><a href="articles.html?category=Business">Business</a><a href="articles.html?category=Sports">Sports</a><a href="articles.html?category=Lifestyle">Lifestyle</a></div></div>
+      <div><p class="dr-footer-col-head">Follow Us</p><div class="dr-footer-socials">
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div><div><div class="dr-footer-social-name">Facebook</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div><div><div class="dr-footer-social-name">Instagram</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+        <div class="dr-footer-social-item"><div class="dr-footer-social-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg></div><div><div class="dr-footer-social-name">TikTok</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div></div>
+      </div></div>
+    </div>
+  </div>
+</footer>
+
+<div class="dr-social-sidebar" id="dr-social-sidebar">
+  <a href="https://facebook.com/draftmagazine" target="_blank" rel="noopener" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+  <a href="https://instagram.com/draft.mag" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+  <a href="https://tiktok.com/@draftmag" target="_blank" rel="noopener" aria-label="TikTok"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg></a>
+</div>
+
+<script>
+(function() {
+
+  // ============================================================
+  // CMS DATA — Update covers here
+  // ============================================================
+  var COVERS = [
+    { title:'The Symmetry Issue',   type:'Print',   volume:'Volume 12', date:'March 2024',   image:'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=820&fit=crop&auto=format' },
+    { title:'Digital Solitude',     type:'Digital', volume:'Special Edition', date:'Jan 2024', image:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=820&fit=crop&auto=format' },
+    { title:'Materiality & Form',   type:'Print',   volume:'Volume 11', date:'Nov 2023',   image:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=820&fit=crop&auto=format' },
+    { title:'The Power Issue',      type:'Print',   volume:'Volume 10', date:'Aug 2023',   image:'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=820&fit=crop&auto=format' },
+    { title:'Soft Architecture',    type:'Limited', volume:'Limited Edition', date:'Jun 2023', image:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=820&fit=crop&auto=format' },
+    { title:'The Identity Issue',   type:'Digital', volume:'Volume 9',  date:'May 2023',   image:'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&h=820&fit=crop&auto=format' },
+    { title:'Chromatic Shift',      type:'Print',   volume:'Volume 8',  date:'Mar 2023',   image:'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=820&fit=crop&auto=format' },
+    { title:'Quiet Luxury',         type:'Limited', volume:'Limited Edition', date:'Dec 2022', image:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=820&fit=crop&auto=format' },
+    { title:'The Future Issue',     type:'Digital', volume:'Volume 7',  date:'Nov 2022',   image:'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=820&fit=crop&auto=format' },
+    { title:'New Modernism',        type:'Print',   volume:'Volume 6',  date:'Aug 2022',   image:'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&h=820&fit=crop&auto=format' },
+    { title:'The Art of Restraint', type:'Print',   volume:'Volume 5',  date:'May 2022',   image:'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=600&h=820&fit=crop&auto=format' },
+    { title:'Surface Tensions',     type:'Limited', volume:'Limited Edition', date:'Feb 2022', image:'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&h=820&fit=crop&auto=format' }
+  ];
+
+  var TYPE_COLORS = { Print:'#045350', Digital:'#51356f', Limited:'#111111' };
+  // ============================================================
+
+  var grid = document.getElementById('dr-cover-grid');
+  COVERS.forEach(function(c) {
+    var color = TYPE_COLORS[c.type] || '#111';
+    var sub = c.volume + ' — ' + c.date;
+    grid.innerHTML +=
+      '<div class="dr-cover-card">' +
+        '<div class="dr-cover-img-wrap">' +
+          '<img src="' + c.image + '" alt="' + c.title + '" loading="lazy" />' +
+          '<div class="dr-cover-overlay"><span class="dr-cover-view-btn">View Issue</span></div>' +
+        '</div>' +
+        '<div class="dr-cover-meta">' +
+          '<h3 class="dr-cover-title">' + c.title + '</h3>' +
+          '<span class="dr-cover-type" style="color:' + color + ';border:1px solid ' + color + '">' + c.type + '</span>' +
+        '</div>' +
+        '<div class="dr-cover-sub">' + sub + '</div>' +
+      '</div>';
+  });
+
+  // Mobile menu
+  var hamburger = document.getElementById('dr-hamburger');
+  var mobileMenu = document.getElementById('dr-mobile-menu');
+  var menuIcon = document.getElementById('dr-menu-icon');
+  var closeIcon = document.getElementById('dr-close-icon');
+  var isOpen = false;
+  hamburger.addEventListener('click', function() {
+    isOpen = !isOpen;
+    mobileMenu.classList.toggle('open', isOpen);
+    menuIcon.style.display = isOpen ? 'none' : 'block';
+    closeIcon.style.display = isOpen ? 'block' : 'none';
+  });
+
+  // Social sidebar
+  var sidebar = document.getElementById('dr-social-sidebar');
+  window.addEventListener('scroll', function() {
+    sidebar.classList.toggle('visible', window.scrollY > 120);
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>

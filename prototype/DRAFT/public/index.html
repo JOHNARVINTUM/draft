@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DRAFT — Where the Boys Play</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400;1,500;1,700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Cactus+Classical+Serif&family=DM+Serif+Display:ital,wght@0,400;1,400&display=swap');
+
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+body { font-family: 'Inter', sans-serif; background: #FAFAF8; color: #111111; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+/* ── VARIABLES ── */
+:root {
+  --primary: #045350;
+  --accent: #b9d7d9;
+  --bg: #FAFAF8;
+  --fg: #111111;
+  --border: #D9D9D9;
+  --muted: #888888;
+  --container-xl: 1440px;
+  --container-lg: 1100px;
+  --pad: 40px;
+}
+
+/* ── NAVBAR ── */
+.dr-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+.dr-navbar-bar {
+  background: var(--primary);
+  padding: 18px 40px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.dr-navbar-inner { max-width: var(--container-xl); margin: 0 auto; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+.dr-navbar-logo img { height: 52px; width: auto; filter: brightness(0) saturate(0) invert(1); opacity: .95; }
+.dr-nav-links { display: flex; align-items: center; gap: 40px; }
+.dr-nav-links a {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.58);
+  border-bottom: 1.5px solid transparent; padding-bottom: 2px;
+  transition: color .2s;
+}
+.dr-nav-links a:hover, .dr-nav-links a.active { color: #fff; }
+.dr-nav-links a.active { font-weight: 800; border-bottom-color: rgba(255,255,255,.6); }
+.dr-hamburger { display: none; position: absolute; right: 0; top: 0; color: #fff; padding: 4px; }
+.dr-spacer { height: 86px; }
+
+/* Mobile menu */
+.dr-mobile-menu {
+  display: none; position: fixed; inset: 0; z-index: 49;
+  background: var(--primary); padding-top: 86px;
+}
+.dr-mobile-menu.open { display: block; }
+.dr-mobile-menu nav { padding: 32px; display: flex; flex-direction: column; }
+.dr-mobile-menu nav a {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 700;
+  letter-spacing: -.01em; color: rgba(255,255,255,.6); padding: 16px 0;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  transition: color .2s;
+}
+.dr-mobile-menu nav a:last-child { border-bottom: none; }
+.dr-mobile-menu nav a:hover, .dr-mobile-menu nav a.active { color: #fff; }
+
+/* ── FOOTER ── */
+.dr-footer { background: var(--primary); color: #fff; }
+.dr-footer-hairline { padding: 60px; }
+.dr-footer-hairline-line { display: flex; align-items: center; }
+.dr-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.55); flex-shrink: 0; }
+.dr-footer-rule { flex: 1; height: 1px; background: rgba(255,255,255,.3); }
+.dr-footer-body {
+  max-width: var(--container-xl); margin: 0 auto;
+  padding: 64px 56px 72px;
+  display: grid; grid-template-columns: 42% 58%; gap: 0; align-items: start;
+}
+.dr-footer-left { display: flex; flex-direction: column; align-items: flex-start; }
+.dr-footer-icon { height: 200px; width: auto; filter: brightness(0) invert(1); margin-bottom: 15px; }
+.dr-footer-tagline {
+  font-family: 'Cactus Classical Serif', 'PT Serif', Georgia, serif;
+  font-size: 22px; font-weight: 700; font-style: italic; color: #fff;
+  margin: 0 0 3px; letter-spacing: .01em; line-height: 1.2;
+}
+.dr-footer-sub {
+  font-family: 'PT Serif', Georgia, serif;
+  font-size: 13px; font-style: italic; color: rgba(255,255,255,.5); line-height: 1.55;
+}
+.dr-footer-right { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 0; }
+.dr-footer-col-head {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase; color: #fff; margin: 0 0 18px;
+}
+.dr-footer-col-links { display: flex; flex-direction: column; gap: 11px; }
+.dr-footer-col-links a {
+  font-family: 'PT Serif', Georgia, serif; font-size: 15px; color: rgba(255,255,255,.72);
+  transition: color .15s; display: block; line-height: 1.4;
+}
+.dr-footer-col-links a:hover { color: #fff; }
+.dr-footer-socials { display: flex; flex-direction: column; gap: 14px; }
+.dr-footer-social-item { display: flex; align-items: center; gap: 11px; }
+.dr-footer-social-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+}
+.dr-footer-social-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: #fff; line-height: 1.25; }
+.dr-footer-social-handle { font-family: 'Inter', sans-serif; font-size: 11px; color: rgba(255,255,255,.42); margin-top: 1px; line-height: 1.3; }
+
+/* ── SOCIAL SIDEBAR ── */
+.dr-social-sidebar {
+  position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
+  z-index: 100; display: flex; flex-direction: column; align-items: center;
+  gap: 8px; padding: 12px 10px;
+  background: rgba(240,242,242,.85); backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 40px; box-shadow: 0 4px 24px rgba(0,0,0,.10);
+  opacity: 0; pointer-events: none; transition: opacity .35s ease;
+}
+.dr-social-sidebar.visible { opacity: 1; pointer-events: auto; }
+.dr-social-sidebar a {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,.9);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary); box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.dr-social-sidebar a:hover {
+  background: var(--primary); color: #fff;
+  box-shadow: 0 4px 14px rgba(4,83,80,.35);
+}
+
+/* ── HERO ── */
+.dr-hero {
+  position: relative; height: 88vh; min-height: 560px;
+  background: #0a0a0a; overflow: hidden;
+}
+.dr-hero-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+}
+.dr-hero-overlay1 {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,.82) 0%, rgba(0,0,0,.3) 55%, rgba(0,0,0,.6) 100%);
+}
+.dr-hero-overlay2 {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 50%);
+}
+.dr-hero-watermark {
+  position: absolute; left: 3%; top: 50%; transform: translateY(-50%);
+  height: 65%; width: auto; opacity: .06;
+  filter: brightness(0) invert(1); pointer-events: none;
+}
+.dr-hero-content {
+  position: relative; height: 100%; display: flex; align-items: flex-end;
+}
+.dr-hero-inner {
+  max-width: var(--container-xl); margin: 0 auto;
+  padding: 0 40px 64px; width: 100%;
+}
+.dr-hero-text { max-width: 520px; }
+.dr-hero-badge {
+  display: inline-block;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--accent);
+  border: 1px solid rgba(185,215,217,.4); padding: 4px 12px; margin-bottom: 16px;
+}
+.dr-hero-h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(36px, 5vw, 60px); font-weight: 800;
+  letter-spacing: -.03em; line-height: 1.06; color: #fff; margin-bottom: 14px;
+}
+.dr-hero-excerpt {
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px;
+  color: rgba(255,255,255,.52); line-height: 1.65; margin-bottom: 28px;
+}
+.dr-hero-cta {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  padding: 12px 28px; background: var(--primary); color: #fff;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: opacity .2s;
+}
+.dr-hero-cta:hover { opacity: .85; }
+
+/* ── FEATURED ── */
+.dr-featured { background: #fff; padding: 72px 0; }
+.dr-featured-inner {
+  max-width: var(--container-xl); margin: 0 auto; padding: 0 40px;
+  display: grid; grid-template-columns: 42% 58%; gap: 56px; align-items: center;
+}
+.dr-featured-h2 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(40px, 5.5vw, 68px); font-weight: 800;
+  letter-spacing: -.03em; color: var(--primary); line-height: 1; margin-bottom: 6px;
+}
+.dr-featured-links { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+.dr-featured-links a {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600;
+  color: var(--primary); letter-spacing: .06em; transition: opacity .15s;
+}
+.dr-featured-links a:hover { opacity: .6; }
+.dr-featured-links span { color: var(--accent); font-size: 11px; }
+.dr-feat-cats { display: flex; gap: 14px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+.dr-feat-cats a {
+  font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500;
+  color: #888; letter-spacing: .08em; text-transform: uppercase; transition: color .15s;
+}
+.dr-feat-cats a:hover { color: var(--primary); }
+.dr-feat-cats span { color: #ddd; font-size: 10px; }
+.dr-featured-desc {
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 300;
+  color: #555; line-height: 1.8; max-width: 380px;
+}
+.dr-featured-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: 58% 38%; gap: 10px; height: 500px;
+}
+.dr-feat-img { overflow: hidden; background: #D8D8D4; border-radius: 4px; }
+.dr-feat-img.tall { grid-row: 1 / 3; }
+.dr-feat-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+
+/* ── NEW ARTICLES ── */
+.dr-new-articles { background: #FAFAF8; padding: 72px 0; }
+.dr-new-articles-inner { max-width: var(--container-xl); margin: 0 auto; padding: 0 40px; }
+.dr-section-heading {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; margin-bottom: 52px;
+}
+.dr-section-heading img { height: 30px; width: auto; }
+.dr-section-heading span {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(18px, 2.4vw, 26px); font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--primary);
+}
+.dr-articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.dr-article-card {
+  background: #fff; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 2px 14px rgba(0,0,0,.07);
+  transform: translateY(0); transition: box-shadow .3s ease, transform .3s ease;
+}
+.dr-article-card:hover {
+  box-shadow: 0 20px 48px rgba(0,0,0,.14);
+  transform: translateY(-4px);
+}
+.dr-article-img-wrap { position: relative; overflow: hidden; aspect-ratio: 4/3; background: #E4E4DF; }
+.dr-article-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .65s cubic-bezier(.25,.46,.45,.94);
+}
+.dr-article-card:hover .dr-article-img-wrap img { transform: scale(1.05); }
+.dr-article-img-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, rgba(0,0,0,.04) 50%, rgba(0,0,0,.32) 100%);
+  pointer-events: none;
+}
+.dr-card-stamps { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 4px; }
+.dr-card-stamps img { height: 13px; width: auto; filter: brightness(0) invert(1); }
+.dr-card-d {
+  position: absolute; bottom: 4px; right: 10px;
+  font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700;
+  color: rgba(255,255,255,.15); line-height: 1; user-select: none; pointer-events: none;
+}
+.dr-article-body { padding: 22px 22px 28px; }
+.dr-article-h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800;
+  letter-spacing: -.02em; color: var(--primary); line-height: 1.1; margin-bottom: 12px;
+  transition: opacity .2s;
+}
+.dr-article-card:hover .dr-article-h3 { opacity: .75; }
+.dr-article-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.dr-article-author {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--primary);
+}
+.dr-article-cat-pill {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 8px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--primary);
+  background: rgba(4,83,80,.09); padding: 3px 8px; border-radius: 20px;
+}
+.dr-article-date {
+  font-family: 'Inter', sans-serif; font-size: 10px; color: #aaa; margin-bottom: 14px;
+}
+.dr-article-excerpt {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 400;
+  color: #444; line-height: 1.75; margin-bottom: 18px;
+}
+.dr-article-brand-quote {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600;
+  color: var(--primary); line-height: 1.6; margin-bottom: 20px;
+  border-left: 2px solid var(--primary); padding-left: 10px;
+}
+.dr-article-read-link {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--primary);
+  display: inline-flex; align-items: center; gap: 5px;
+  border-bottom: 1px solid rgba(4,83,80,.35); padding-bottom: 2px;
+}
+
+/* ── NEW COVERS ── */
+.dr-new-covers { background: #f8f6f1; padding: 80px 0; }
+.dr-new-covers-inner {
+  max-width: var(--container-lg); margin: 0 auto; padding: 0 40px;
+  display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: start;
+}
+.dr-covers-hero { border-radius: 6px; overflow: hidden; height: 540px; }
+.dr-covers-hero img { width: 100%; height: 100%; object-fit: cover; }
+.dr-covers-logo { height: 80px; width: auto; margin-bottom: 10px; }
+.dr-covers-title {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--primary);
+  margin: 0 0 16px;
+}
+.dr-covers-desc {
+  font-family: 'Inter', sans-serif; font-size: 13px; color: #777; line-height: 1.7;
+  margin: 0 0 22px; max-width: 340px;
+}
+.dr-covers-browse {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--primary);
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 24px; border-bottom: 1.5px solid var(--primary); padding-bottom: 2px;
+}
+.dr-thumb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dr-thumb {
+  display: block; overflow: hidden; border-radius: 4px;
+  border: 2px solid transparent; height: 116px;
+  transition: border-color .2s ease, transform .2s ease, opacity .2s ease;
+}
+.dr-thumb:hover { border-color: var(--primary); transform: scale(1.04); opacity: .85; }
+.dr-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── MAGAZINE SECTION ── */
+.dr-magazine-section { background: #fff; padding: 80px 0 88px; }
+.dr-magazine-inner { max-width: var(--container-xl); margin: 0 auto; padding: 0 40px; }
+.dr-mag-heading { text-align: center; margin-bottom: 56px; }
+.dr-mag-heading img { height: 40px; width: auto; display: inline-block; margin-bottom: 6px; }
+.dr-mag-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(28px, 4vw, 48px); font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase; color: var(--primary); line-height: 1;
+}
+.dr-mag-carousel-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.dr-mag-arrow {
+  position: absolute; z-index: 10; width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid #111; background: transparent;
+  display: flex; align-items: center; justify-content: center; color: #111;
+  transition: background .2s, color .2s;
+}
+.dr-mag-arrow:hover { background: #111; color: #fff; }
+.dr-mag-arrow:disabled { border-color: #ddd; color: #ccc; cursor: default; }
+.dr-mag-arrow:disabled:hover { background: transparent; color: #ccc; }
+.dr-mag-arrow.prev { left: 0; }
+.dr-mag-arrow.next { right: 0; }
+.dr-mag-cards { display: flex; align-items: center; gap: 20px; padding: 0 70px; }
+.dr-mag-card { flex: 0 0 auto; transition: all .45s cubic-bezier(.25,.46,.45,.94); cursor: pointer; }
+.dr-mag-card.side { transform: scale(.82); opacity: .55; }
+.dr-mag-card.side img { filter: grayscale(30%); }
+.dr-mag-card.active { cursor: default; }
+.dr-mag-card-inner { position: relative; aspect-ratio: 2/3; overflow: hidden; background: #D8D8D4; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+.dr-mag-card.active .dr-mag-card-inner {
+  box-shadow: 0 20px 60px rgba(4,83,80,.25), 0 8px 24px rgba(0,0,0,.18);
+}
+.dr-mag-card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dr-mag-card-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 50%);
+  pointer-events: none;
+}
+.dr-mag-card-logo { position: absolute; top: 10px; left: 10px; height: 16px; width: auto; filter: brightness(0) invert(1); opacity: .85; }
+.dr-mag-card.active .dr-mag-card-logo { height: 22px; }
+.dr-mag-card-name {
+  position: absolute; bottom: 10px; left: 10px;
+  font-family: 'PT Serif', Georgia, serif; font-size: 14px; font-style: italic; color: #fff;
+}
+.dr-mag-card.active .dr-mag-card-name { font-size: 20px; bottom: 14px; left: 14px; }
+.dr-mag-card-issue {
+  position: absolute; bottom: 14px; left: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55);
+  margin-top: 4px; display: none;
+}
+.dr-mag-card.active + .dr-mag-card-issue { display: block; }
+/* Active card has teal frame */
+.dr-mag-active-frame {
+  padding: 6px; background: var(--primary);
+  box-shadow: 0 20px 60px rgba(4,83,80,.25), 0 8px 24px rgba(0,0,0,.18);
+}
+.dr-mag-dots { display: flex; justify-content: center; gap: 8px; margin-top: 32px; }
+.dr-mag-dot {
+  height: 8px; border-radius: 4px; border: none; padding: 0; cursor: pointer;
+  background: #D9D9D9; transition: all .3s ease;
+}
+.dr-mag-dot.active { width: 24px; background: var(--primary); }
+.dr-mag-dot:not(.active) { width: 8px; }
+.dr-mag-cta-wrap { text-align: center; margin-top: 28px; }
+.dr-mag-cta {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  padding: 12px 32px; border: 1.5px solid var(--primary); color: var(--primary);
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all .2s;
+}
+.dr-mag-cta:hover { background: var(--primary); color: #fff; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .dr-featured-inner { grid-template-columns: 1fr; }
+  .dr-featured-grid { height: 380px; }
+  .dr-new-covers-inner { grid-template-columns: 1fr; }
+  .dr-covers-hero { height: 380px; }
+}
+@media (max-width: 768px) {
+  .dr-nav-links { display: none; }
+  .dr-hamburger { display: flex; }
+  .dr-articles-grid { grid-template-columns: 1fr; }
+  .dr-featured-inner { grid-template-columns: 1fr; }
+  .dr-mag-cards { padding: 0 50px; }
+  .dr-footer-body { grid-template-columns: 1fr; }
+  .dr-footer-right { margin-top: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<div class="dr-spacer"></div>
+<nav class="dr-navbar">
+  <div class="dr-navbar-bar">
+    <div class="dr-navbar-inner">
+      <a href="index.html" class="dr-navbar-logo">
+        <img src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="DRAFT" />
+      </a>
+      <div class="dr-nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="covers.html">Covers</a>
+        <a href="magazines.html">Magazine</a>
+        <a href="articles.html">Articles</a>
+        <a href="about.html">About Us</a>
+      </div>
+      <button class="dr-hamburger" id="dr-hamburger" aria-label="Toggle menu">
+        <svg id="dr-menu-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="dr-close-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="dr-mobile-menu" id="dr-mobile-menu">
+  <nav>
+    <a href="index.html" class="active">Home</a>
+    <a href="covers.html">Covers</a>
+    <a href="magazines.html">Magazine</a>
+    <a href="articles.html">Articles</a>
+    <a href="about.html">About Us</a>
+  </nav>
+</div>
+
+<!-- ── HERO ── -->
+<section class="dr-hero">
+  <img class="dr-hero-bg" src="../src/imports/9.png" alt="DRAFT hero" />
+  <div class="dr-hero-overlay1"></div>
+  <div class="dr-hero-overlay2"></div>
+  <img class="dr-hero-watermark" src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="" aria-hidden="true" />
+  <div class="dr-hero-content">
+    <div class="dr-hero-inner">
+      <div class="dr-hero-text">
+        <span class="dr-hero-badge">Where the Boys Play</span>
+        <h1 class="dr-hero-h1">The Modern Voice of Fashion, Business &amp; Lifestyle</h1>
+        <p class="dr-hero-excerpt">Bold stories. Unfiltered perspectives. By fans, for fans.</p>
+        <a href="articles.html" class="dr-hero-cta">
+          Explore Articles
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURED ── -->
+<section class="dr-featured">
+  <div class="dr-featured-inner">
+    <div>
+      <h2 class="dr-featured-h2">FEATURED</h2>
+      <div class="dr-featured-links">
+        <a href="covers.html">Covers</a><span>|</span>
+        <a href="magazines.html">Magazine</a><span>|</span>
+        <a href="articles.html">Articles</a>
+      </div>
+      <div class="dr-feat-cats">
+        <a href="articles.html?category=Fashion">Fashion</a><span>|</span>
+        <a href="articles.html?category=Beauty">Beauty</a><span>|</span>
+        <a href="articles.html?category=Lifestyle">Lifestyle</a><span>|</span>
+        <a href="articles.html?category=Sport">Sport</a><span>|</span>
+        <a href="articles.html?category=Business">Business</a>
+      </div>
+      <p class="dr-featured-desc">Explore the most talked-about articles, exclusive interviews, and trending insights curated by our editors. From fashion and beauty to lifestyle, sports, and business, discover content that inspires, informs, and captivates.</p>
+    </div>
+    <div class="dr-featured-grid">
+      <div class="dr-feat-img tall">
+        <img src="../src/imports/9.png" alt="Cover 1" />
+      </div>
+      <div class="dr-feat-img">
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=420&fit=crop&auto=format" alt="Cover 2" />
+      </div>
+      <div class="dr-feat-img">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=220&fit=crop&auto=format" alt="Cover 3" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEW ARTICLES ── -->
+<section class="dr-new-articles">
+  <div class="dr-new-articles-inner">
+    <div class="dr-section-heading">
+      <img src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="draft" />
+      <span>NEW ARTICLES</span>
+    </div>
+    <div class="dr-articles-grid" id="dr-articles-grid"></div>
+  </div>
+</section>
+
+<!-- ── NEW COVERS ── -->
+<section class="dr-new-covers">
+  <div class="dr-new-covers-inner">
+    <div class="dr-covers-hero">
+      <img src="https://images.unsplash.com/photo-1463453091185-61582044d556?w=600&h=900&fit=crop&auto=format" alt="Featured cover" />
+    </div>
+    <div>
+      <img class="dr-covers-logo" src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="draft" />
+      <p class="dr-covers-title">NEW COVERS</p>
+      <p class="dr-covers-desc">Explore DRAFT's most compelling cover stories, showcasing influential personalities, inspiring narratives that shape culture, fashion, business, sports, and lifestyle.</p>
+      <a href="covers.html" class="dr-covers-browse">
+        BROWSE COVERS
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <div class="dr-thumb-grid">
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1488161628813-04466f872be2?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+        <a href="covers.html" class="dr-thumb"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&h=160&fit=crop&auto=format" alt="cover" /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAGAZINE ── -->
+<section class="dr-magazine-section">
+  <div class="dr-magazine-inner">
+    <div class="dr-mag-heading">
+      <img src="../src/imports/draft_logo_gram__transparent__-_green.png" alt="draft" />
+      <div class="dr-mag-title">MAGAZINE</div>
+    </div>
+    <div class="dr-mag-carousel-wrap">
+      <button class="dr-mag-arrow prev" id="dr-mag-prev" aria-label="Previous">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="dr-mag-cards" id="dr-mag-cards"></div>
+      <button class="dr-mag-arrow next" id="dr-mag-next" aria-label="Next">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="dr-mag-dots" id="dr-mag-dots"></div>
+    <div class="dr-mag-cta-wrap">
+      <a href="magazines.html" class="dr-mag-cta">
+        View All Magazines
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="dr-footer">
+  <div class="dr-footer-hairline">
+    <div class="dr-footer-hairline-line">
+      <div class="dr-footer-dot"></div>
+      <div class="dr-footer-rule"></div>
+      <div class="dr-footer-dot"></div>
+    </div>
+  </div>
+  <div class="dr-footer-body">
+    <div class="dr-footer-left">
+      <img class="dr-footer-icon" src="../src/imports/draft_icon-2.png" alt="DRAFT" />
+      <p class="dr-footer-tagline">Where the Boys Play</p>
+      <p class="dr-footer-sub">The modern voice of fashion, business &amp; lifestyle.</p>
+    </div>
+    <div class="dr-footer-right">
+      <div>
+        <p class="dr-footer-col-head">Navigate</p>
+        <div class="dr-footer-col-links">
+          <a href="index.html">Home</a>
+          <a href="covers.html">Covers</a>
+          <a href="magazines.html">Magazine</a>
+          <a href="articles.html">Articles</a>
+          <a href="about.html">About Us</a>
+        </div>
+      </div>
+      <div>
+        <p class="dr-footer-col-head">Categories</p>
+        <div class="dr-footer-col-links">
+          <a href="articles.html?category=Fashion">Fashion</a>
+          <a href="articles.html?category=Beauty">Beauty</a>
+          <a href="articles.html?category=Business">Business</a>
+          <a href="articles.html?category=Sports">Sports</a>
+          <a href="articles.html?category=Lifestyle">Lifestyle</a>
+        </div>
+      </div>
+      <div>
+        <p class="dr-footer-col-head">Follow Us</p>
+        <div class="dr-footer-socials">
+          <div class="dr-footer-social-item">
+            <div class="dr-footer-social-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </div>
+            <div><div class="dr-footer-social-name">Facebook</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div>
+          </div>
+          <div class="dr-footer-social-item">
+            <div class="dr-footer-social-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+            <div><div class="dr-footer-social-name">Instagram</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div>
+          </div>
+          <div class="dr-footer-social-item">
+            <div class="dr-footer-social-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg>
+            </div>
+            <div><div class="dr-footer-social-name">TikTok</div><div class="dr-footer-social-handle">@DraftMagazine.ph</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ── SOCIAL SIDEBAR ── -->
+<div class="dr-social-sidebar" id="dr-social-sidebar">
+  <a href="https://facebook.com/draftmagazine" target="_blank" rel="noopener" aria-label="Facebook">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+  </a>
+  <a href="https://instagram.com/draft.mag" target="_blank" rel="noopener" aria-label="Instagram">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+  </a>
+  <a href="https://tiktok.com/@draftmag" target="_blank" rel="noopener" aria-label="TikTok">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.04-7.13a8.26 8.26 0 004.83 1.54V6.27a4.85 4.85 0 01-1.02-.07z"/></svg>
+  </a>
+</div>
+
+<script>
+(function() {
+
+  // ============================================================
+  // CMS DATA — Update articles and magazines here
+  // ============================================================
+  var ARTICLES = [
+    {
+      title: 'Article 1',
+      author: 'DraftMagazine.ph',
+      date: 'June 10, 2026',
+      category: 'Lifestyle',
+      image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=800&fit=crop&auto=format',
+      slug: 'articles.html',
+      excerpt: 'Step inside the world of understated elegance where less is always more. We explore how modern men are redefining luxury through quiet confidence — no logos, no noise, just impeccable taste.'
+    },
+    {
+      title: 'Article 2',
+      author: 'DraftMagazine.ph',
+      date: 'June 10, 2026',
+      category: 'Fashion',
+      image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=800&fit=crop&auto=format',
+      slug: 'articles.html',
+      excerpt: 'The wardrobe has always been a power move. From the boardroom to the courtside, we break down the pieces, the silhouettes, and the mindset behind the men who dress to own the room.'
+    },
+    {
+      title: 'Article 3',
+      author: 'DraftMagazine.ph',
+      date: 'June 10, 2026',
+      category: 'Beauty',
+      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=800&fit=crop&auto=format',
+      slug: 'articles.html',
+      excerpt: 'Skincare is no longer a secret. The modern man has embraced the ritual — serums, SPF, and beyond. We trace the cultural shift that turned grooming into a form of self-respect.'
+    }
+  ];
+
+  var MAG_COVERS = [
+    { id:'1', name:'Darrick', issue:'Issue 07', image:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=700&fit=crop&auto=format' },
+    { id:'2', name:'Rangel',  issue:'Issue 08', image:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=700&fit=crop&auto=format' },
+    { id:'3', name:'Anthony', issue:'Issue 09', image:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=700&fit=crop&auto=format' },
+    { id:'4', name:'Marcus',  issue:'Issue 10', image:'https://images.unsplash.com/photo-1463453091185-61582044d556?w=500&h=700&fit=crop&auto=format' },
+    { id:'5', name:'James',   issue:'Issue 11', image:'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&h=700&fit=crop&auto=format' },
+    { id:'6', name:'Leon',    issue:'Issue 12', image:'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=500&h=700&fit=crop&auto=format' }
+  ];
+  // ============================================================
+
+  var LOGO = '../src/imports/draft_logo_gram__transparent__-_green.png';
+
+  // ── Render article cards ──
+  var grid = document.getElementById('dr-articles-grid');
+  ARTICLES.forEach(function(a) {
+    grid.innerHTML += '<div class="dr-article-card">' +
+      '<div class="dr-article-img-wrap">' +
+        '<img src="' + a.image + '" alt="' + a.title + '" />' +
+        '<div class="dr-article-img-gradient"></div>' +
+        '<div class="dr-card-stamps">' +
+          '<img src="' + LOGO + '" style="opacity:1" />' +
+          '<img src="' + LOGO + '" style="opacity:.65" />' +
+          '<img src="' + LOGO + '" style="opacity:.35" />' +
+        '</div>' +
+        '<div class="dr-card-d">D</div>' +
+      '</div>' +
+      '<div class="dr-article-body">' +
+        '<h3 class="dr-article-h3">' + a.title + '</h3>' +
+        '<div class="dr-article-meta">' +
+          '<span class="dr-article-author">Authored by ' + a.author + '</span>' +
+          '<span class="dr-article-cat-pill">' + a.category + '</span>' +
+        '</div>' +
+        '<p class="dr-article-date">Published on ' + a.date + '</p>' +
+        '<p class="dr-article-excerpt">' + a.excerpt + '</p>' +
+        '<p class="dr-article-brand-quote">DRAFT is for the man who reads between the lines — and dresses like he wrote them.</p>' +
+        '<a href="' + a.slug + '" class="dr-article-read-link">Read Full Article <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>' +
+      '</div>' +
+    '</div>';
+  });
+
+  // ── Magazine carousel ──
+  var magActive = 1;
+  var total = MAG_COVERS.length;
+
+  function renderMag() {
+    var cardsEl = document.getElementById('dr-mag-cards');
+    var dotsEl = document.getElementById('dr-mag-dots');
+    var prevEl = document.getElementById('dr-mag-prev');
+    var nextEl = document.getElementById('dr-mag-next');
+
+    var prev = MAG_COVERS[magActive - 1];
+    var curr = MAG_COVERS[magActive];
+    var next = MAG_COVERS[magActive + 1];
+    var canPrev = magActive > 1;
+    var canNext = magActive < total - 2;
+
+    prevEl.disabled = !canPrev;
+    nextEl.disabled = !canNext;
+
+    var sideW = 'clamp(160px, 18vw, 230px)';
+    var activeW = 'clamp(220px, 26vw, 340px)';
+
+    cardsEl.innerHTML =
+      // Prev
+      '<div class="dr-mag-card side" style="width:' + sideW + '" onclick="' + (canPrev ? 'drMagPrev()' : '') + '">' +
+        '<div class="dr-mag-card-inner">' +
+          '<img class="dr-mag-card-img" src="' + prev.image + '" alt="' + prev.name + '" />' +
+          '<div class="dr-mag-card-grad"></div>' +
+          '<img class="dr-mag-card-logo" src="' + LOGO + '" />' +
+          '<div class="dr-mag-card-name">' + prev.name + '</div>' +
+        '</div>' +
+      '</div>' +
+      // Active
+      '<div class="dr-mag-card active" style="width:' + activeW + '">' +
+        '<div class="dr-mag-active-frame">' +
+          '<div class="dr-mag-card-inner" style="box-shadow:none">' +
+            '<img class="dr-mag-card-img" src="' + curr.image + '" alt="' + curr.name + '" />' +
+            '<div class="dr-mag-card-grad"></div>' +
+            '<img class="dr-mag-card-logo" src="' + LOGO + '" style="height:22px;top:14px;left:14px" />' +
+            '<div style="position:absolute;bottom:14px;left:14px">' +
+              '<div style="font-family:\'PT Serif\',serif;font-size:20px;font-style:italic;color:#fff;line-height:1.2">' + curr.name + '</div>' +
+              '<div style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px">' + curr.issue + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      // Next
+      '<div class="dr-mag-card side" style="width:' + sideW + '" onclick="' + (canNext ? 'drMagNext()' : '') + '">' +
+        '<div class="dr-mag-card-inner">' +
+          '<img class="dr-mag-card-img" src="' + next.image + '" alt="' + next.name + '" />' +
+          '<div class="dr-mag-card-grad"></div>' +
+          '<img class="dr-mag-card-logo" src="' + LOGO + '" />' +
+          '<div class="dr-mag-card-name">' + next.name + '</div>' +
+        '</div>' +
+      '</div>';
+
+    dotsEl.innerHTML = '';
+    MAG_COVERS.forEach(function(_, i) {
+      var dot = document.createElement('button');
+      dot.className = 'dr-mag-dot' + (i === magActive ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to magazine ' + (i + 1));
+      dot.onclick = function() { magActive = Math.max(1, Math.min(i, total - 2)); renderMag(); };
+      dotsEl.appendChild(dot);
+    });
+  }
+
+  window.drMagPrev = function() { if (magActive > 1) { magActive--; renderMag(); } };
+  window.drMagNext = function() { if (magActive < total - 2) { magActive++; renderMag(); } };
+  document.getElementById('dr-mag-prev').onclick = window.drMagPrev;
+  document.getElementById('dr-mag-next').onclick = window.drMagNext;
+  renderMag();
+
+  // ── Mobile menu ──
+  var hamburger = document.getElementById('dr-hamburger');
+  var mobileMenu = document.getElementById('dr-mobile-menu');
+  var menuIcon = document.getElementById('dr-menu-icon');
+  var closeIcon = document.getElementById('dr-close-icon');
+  var isOpen = false;
+  hamburger.addEventListener('click', function() {
+    isOpen = !isOpen;
+    mobileMenu.classList.toggle('open', isOpen);
+    menuIcon.style.display = isOpen ? 'none' : 'block';
+    closeIcon.style.display = isOpen ? 'block' : 'none';
+  });
+
+  // ── Social sidebar scroll ──
+  var sidebar = document.getElementById('dr-social-sidebar');
+  window.addEventListener('scroll', function() {
+    sidebar.classList.toggle('visible', window.scrollY > 120);
+  }, { passive: true });
+
+})();
+</script>
+</body>
+</html>
