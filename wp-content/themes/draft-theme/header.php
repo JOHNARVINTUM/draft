@@ -10,19 +10,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $draft_nav_items = array(
-	array( 'label' => __( 'Home', 'draft-theme' ), 'url' => home_url( '/' ), 'match' => home_url( '/' ) ),
-	array( 'label' => __( 'Covers', 'draft-theme' ), 'url' => home_url( '/covers/' ), 'match' => home_url( '/covers/' ) ),
-	array( 'label' => __( 'Magazine', 'draft-theme' ), 'url' => home_url( '/magazines/' ), 'match' => home_url( '/magazines/' ) ),
-	array( 'label' => __( 'Articles', 'draft-theme' ), 'url' => draft_theme_get_article_archive_url(), 'match' => draft_theme_get_article_archive_url() ),
-	array( 'label' => __( 'About Us', 'draft-theme' ), 'url' => home_url( '/about/' ), 'match' => home_url( '/about/' ) ),
+	array( 'key' => 'home', 'label' => __( 'Home', 'draft-theme' ), 'url' => home_url( '/' ) ),
+	array( 'key' => 'covers', 'label' => __( 'Covers', 'draft-theme' ), 'url' => home_url( '/covers/' ) ),
+	array( 'key' => 'magazines', 'label' => __( 'Magazine', 'draft-theme' ), 'url' => home_url( '/magazines/' ) ),
+	array( 'key' => 'articles', 'label' => __( 'Articles', 'draft-theme' ), 'url' => draft_theme_get_article_archive_url() ),
+	array( 'key' => 'about', 'label' => __( 'About Us', 'draft-theme' ), 'url' => home_url( '/about/' ) ),
 );
 
-$current_path = '/' . trim( (string) ( $GLOBALS['wp']->request ?? '' ), '/' );
+$current_path = wp_parse_url( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ) ), PHP_URL_PATH ) ?: '/';
+$home_path    = wp_parse_url( home_url( '/' ), PHP_URL_PATH ) ?: '/';
+
+if ( '/' !== $home_path && 0 === strpos( $current_path, $home_path ) ) {
+	$current_path = '/' . ltrim( substr( $current_path, strlen( $home_path ) ), '/' );
+}
+
+$current_path = '/' . trim( $current_path, '/' );
 if ( '/' !== $current_path ) {
 	$current_path .= '/';
 }
 if ( is_front_page() ) {
 	$current_path = '/';
+}
+
+if ( ! function_exists( 'draft_theme_is_primary_nav_item_active' ) ) {
+	/**
+	 * Determine the active top-level DRAFT navigation item from the current route.
+	 *
+	 * @param string $key Navigation item key.
+	 * @param string $current_path Current request path with leading/trailing slash.
+	 * @return bool
+	 */
+	function draft_theme_is_primary_nav_item_active( $key, $current_path ) {
+		switch ( $key ) {
+			case 'home':
+				return is_front_page();
+			case 'covers':
+				return is_page( 'covers' ) || 0 === strpos( $current_path, '/covers/' );
+			case 'magazines':
+				return is_page( 'magazines' ) || is_singular( 'magazine_issue' ) || 0 === strpos( $current_path, '/magazines/' );
+			case 'articles':
+				return is_page( 'articles' ) || is_singular( 'post' ) || is_category() || 0 === strpos( $current_path, '/articles/' );
+			case 'about':
+				return is_page( 'about' ) || 0 === strpos( $current_path, '/about/' );
+		}
+
+		return false;
+	}
 }
 
 $draft_is_articles_area = is_page( 'articles' ) || is_singular( 'post' );
@@ -53,8 +86,7 @@ $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Bu
 				<nav class="draft-nav draft-nav--desktop" aria-label="<?php esc_attr_e( 'Primary navigation', 'draft-theme' ); ?>">
 					<?php foreach ( $draft_nav_items as $item ) : ?>
 						<?php
-						$item_path = wp_parse_url( $item['url'], PHP_URL_PATH ) ?: '/';
-						$is_active = '/' === $item_path ? '/' === $current_path : 0 === strpos( $current_path, trailingslashit( $item_path ) );
+						$is_active = draft_theme_is_primary_nav_item_active( $item['key'], $current_path );
 						?>
 						<a class="draft-nav__link<?php echo $is_active ? ' is-active' : ''; ?>" href="<?php echo esc_url( $item['url'] ); ?>"><?php echo esc_html( $item['label'] ); ?></a>
 					<?php endforeach; ?>
@@ -63,36 +95,36 @@ $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Bu
 				<button class="draft-menu-toggle" type="button" aria-expanded="false" aria-controls="draft-mobile-menu" data-draft-menu-toggle>
 					<span class="draft-menu-toggle__line"></span>
 					<span class="draft-menu-toggle__line"></span>
+					<span class="draft-menu-toggle__line"></span>
 					<span class="screen-reader-text"><?php esc_html_e( 'Toggle menu', 'draft-theme' ); ?></span>
 				</button>
 			</div>
 		</div>
-
-		<?php if ( $draft_is_articles_area ) : ?>
-			<div class="draft-article-nav">
-				<nav class="draft-article-nav__cats" aria-label="<?php esc_attr_e( 'Article categories', 'draft-theme' ); ?>">
-					<?php foreach ( $draft_categories as $category_name ) : ?>
-						<?php $is_active_cat = $draft_selected_cat instanceof WP_Term && strtolower( $draft_selected_cat->name ) === strtolower( $category_name ); ?>
-						<a class="<?php echo $is_active_cat ? 'is-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'category', $category_name, draft_theme_get_article_archive_url() ) ); ?>"><?php echo esc_html( $category_name ); ?></a>
-					<?php endforeach; ?>
-				</nav>
-				<form class="draft-article-nav__search" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get">
-					<label class="screen-reader-text" for="draft-article-search"><?php esc_html_e( 'Search articles', 'draft-theme' ); ?></label>
-					<input id="draft-article-search" type="search" name="search" value="<?php echo esc_attr( $draft_search_query ); ?>" placeholder="<?php esc_attr_e( 'Search articles...', 'draft-theme' ); ?>">
-					<button type="submit" aria-label="<?php esc_attr_e( 'Search', 'draft-theme' ); ?>">
-						<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-					</button>
-				</form>
-			</div>
-		<?php endif; ?>
 	</header>
+
+	<?php if ( $draft_is_articles_area ) : ?>
+		<div class="draft-article-nav">
+			<nav class="draft-article-nav__cats" aria-label="<?php esc_attr_e( 'Article categories', 'draft-theme' ); ?>">
+				<?php foreach ( $draft_categories as $category_name ) : ?>
+					<?php $is_active_cat = $draft_selected_cat instanceof WP_Term && strtolower( $draft_selected_cat->name ) === strtolower( $category_name ); ?>
+					<a class="<?php echo $is_active_cat ? 'is-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'category', $category_name, draft_theme_get_article_archive_url() ) ); ?>"><?php echo esc_html( $category_name ); ?></a>
+				<?php endforeach; ?>
+			</nav>
+			<form class="draft-article-nav__search" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get">
+				<label class="screen-reader-text" for="draft-article-search"><?php esc_html_e( 'Search articles', 'draft-theme' ); ?></label>
+				<input id="draft-article-search" type="search" name="search" value="<?php echo esc_attr( $draft_search_query ); ?>" placeholder="<?php esc_attr_e( 'Search articles...', 'draft-theme' ); ?>">
+				<button type="submit" aria-label="<?php esc_attr_e( 'Search', 'draft-theme' ); ?>">
+					<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+				</button>
+			</form>
+		</div>
+	<?php endif; ?>
 
 	<nav id="draft-mobile-menu" class="draft-mobile-menu" aria-label="<?php esc_attr_e( 'Mobile navigation', 'draft-theme' ); ?>" hidden data-draft-mobile-menu>
 		<div class="draft-mobile-menu__links">
 			<?php foreach ( $draft_nav_items as $index => $item ) : ?>
 				<?php
-				$item_path = wp_parse_url( $item['url'], PHP_URL_PATH ) ?: '/';
-				$is_active = '/' === $item_path ? '/' === $current_path : 0 === strpos( $current_path, trailingslashit( $item_path ) );
+				$is_active = draft_theme_is_primary_nav_item_active( $item['key'], $current_path );
 				?>
 				<a class="draft-mobile-menu__link<?php echo $is_active ? ' is-active' : ''; ?>" href="<?php echo esc_url( $item['url'] ); ?>" style="--draft-mobile-delay: <?php echo esc_attr( (string) ( $index * 60 ) ); ?>ms"><?php echo esc_html( $item['label'] ); ?></a>
 			<?php endforeach; ?>

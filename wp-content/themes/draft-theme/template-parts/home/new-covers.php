@@ -45,7 +45,7 @@ $draft_hero_id    = $draft_hero_data ? (int) $draft_hero_data['cover_image_id'] 
 				<img src="<?php echo esc_url( $draft_logo ); ?>" alt="<?php esc_attr_e( 'draft', 'draft-theme' ); ?>">
 				<h2><?php esc_html_e( 'New Covers', 'draft-theme' ); ?></h2>
 				<p><?php esc_html_e( "Explore DRAFT's most compelling cover stories, showcasing influential personalities, inspiring narratives that shape culture, fashion, business, sports, and lifestyle.", 'draft-theme' ); ?></p>
-				<a class="draft-home-text-link" href="<?php echo esc_url( home_url( '/covers/' ) ); ?>"><?php esc_html_e( 'Browse Covers', 'draft-theme' ); ?> &rarr;</a>
+				<a class="draft-home-text-link" href="<?php echo esc_url( home_url( '/covers/' ) ); ?>"><?php esc_html_e( 'Browse Covers', 'draft-theme' ); ?><svg class="draft-home-cta-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
 
 				<div class="draft-home-cover-thumbs">
 					<?php foreach ( $draft_issues as $draft_issue ) : ?>

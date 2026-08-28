@@ -64,7 +64,7 @@
 	var rotator = document.querySelector('[data-draft-featured-rotator]');
 
 	if (rotator) {
-		var slides = Array.prototype.slice.call(rotator.querySelectorAll('[data-draft-featured-slide]'));
+		var slides = Array.prototype.slice.call(rotator.querySelectorAll('.draft-featured-rotator__slide'));
 		var dots = Array.prototype.slice.call(rotator.querySelectorAll('[data-draft-featured-dot]'));
 		var prev = rotator.querySelector('[data-draft-featured-prev]');
 		var next = rotator.querySelector('[data-draft-featured-next]');
@@ -138,106 +138,134 @@
 (function () {
 	'use strict';
 
-	var carousel = document.querySelector('[data-draft-magazine-carousel]');
-
-	if (!carousel) {
-		return;
-	}
-
-	var slides = Array.prototype.slice.call(carousel.querySelectorAll('[data-draft-magazine-slide]'));
-	var dots = Array.prototype.slice.call(carousel.querySelectorAll('[data-draft-magazine-dot]'));
-	var prev = carousel.querySelector('[data-draft-magazine-prev]');
-	var next = carousel.querySelector('[data-draft-magazine-next]');
-	var current = 0;
-	var sideScale = 0.84;
-	var farScale = 0.7;
-
-	function pxVar(name, fallback) {
-		var value = window.getComputedStyle(carousel).getPropertyValue(name).trim();
-		var parsed = parseFloat(value);
-		return Number.isFinite(parsed) ? parsed : fallback;
-	}
-
-	function shortestOffset(index, active, len) {
-		var raw = index - active;
-
-		if (raw > len / 2) {
-			raw -= len;
-		}
-
-		if (raw < -len / 2) {
-			raw += len;
-		}
-
-		return raw;
-	}
-
-	function goTo(index) {
-		if (!slides.length) {
+	function initMagazineArchive(archive) {
+		if (!archive || archive.getAttribute('data-draft-magazines-ready') === 'true') {
 			return;
 		}
 
-		current = ((index % slides.length) + slides.length) % slides.length;
-		render();
-	}
+		var slides = Array.prototype.slice.call(archive.querySelectorAll('[data-draft-magazines-slide]'));
+		var dots = Array.prototype.slice.call(archive.querySelectorAll('[data-draft-magazines-dot]'));
+		var cards = Array.prototype.slice.call(archive.querySelectorAll('[data-draft-magazines-card]'));
+		var currentLink = archive.querySelector('[data-draft-magazines-current-link]');
+		var currentTitle = archive.querySelector('[data-draft-magazines-current-title]');
+		var currentSubtitle = archive.querySelector('[data-draft-magazines-current-subtitle]');
+		var currentDescription = archive.querySelector('[data-draft-magazines-current-description]');
+		var current = 0;
+		var timer = null;
+		var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-	function render() {
-		var step = pxVar('--draft-magazine-step', 168);
+		if (!slides.length || !dots.length) {
+			return;
+		}
+
+		archive.setAttribute('data-draft-magazines-ready', 'true');
 
 		slides.forEach(function (slide, index) {
-			var offset = shortestOffset(index, current, slides.length);
-			var abs = Math.abs(offset);
-			var visible = abs <= 2;
-			var scale = offset === 0 ? 1 : abs === 1 ? sideScale : farScale;
-			var translateX = offset * step;
-			var brightness = offset === 0 ? 1 : 0.72;
-
-			slide.style.display = visible ? 'block' : 'none';
-			slide.style.transform = 'translateX(' + translateX + 'px) scale(' + scale + ')';
-			slide.style.zIndex = String(30 - abs * 10);
-			slide.style.opacity = visible ? '1' : '0';
-			slide.style.filter = 'brightness(' + brightness + ')';
-			slide.style.cursor = offset === 0 ? 'default' : 'pointer';
-			slide.style.boxShadow = offset === 0
-				? '0 30px 70px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.12)'
-				: '0 12px 30px rgba(0,0,0,0.18)';
-			slide.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
+			slide.setAttribute('data-draft-magazines-index', String(index));
 		});
 
 		dots.forEach(function (dot, index) {
-			dot.classList.toggle('is-active', index === current);
-			dot.setAttribute('aria-selected', index === current ? 'true' : 'false');
-		});
-	}
-
-	slides.forEach(function (slide, index) {
-		slide.addEventListener('click', function () {
-			if (index !== current) {
-				goTo(index);
+			dot.setAttribute('data-draft-magazines-index', String(index));
+			if (!dot.hasAttribute('aria-label')) {
+				dot.setAttribute('aria-label', 'Show magazine issue ' + (index + 1));
 			}
 		});
-	});
 
-	dots.forEach(function (dot, index) {
-		dot.addEventListener('click', function () {
-			goTo(index);
-		});
-	});
+		function render() {
+			slides.forEach(function (slide, index) {
+				var isActive = index === current;
+				slide.classList.toggle('is-active', isActive);
+				slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+			});
 
-	if (prev) {
-		prev.addEventListener('click', function () {
-			goTo(current - 1);
+			dots.forEach(function (dot, index) {
+				var isActive = index === current;
+				dot.classList.toggle('is-active', isActive);
+				dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+			});
+
+			cards.forEach(function (card, index) {
+				card.classList.toggle('is-current', index === current);
+			});
+
+			if (!slides[current]) {
+				return;
+			}
+
+			if (currentLink) {
+				currentLink.setAttribute('href', slides[current].getAttribute('data-url') || slides[current].getAttribute('href') || '#');
+			}
+
+			if (currentTitle) {
+				currentTitle.textContent = slides[current].getAttribute('data-title') || '';
+			}
+
+			if (currentSubtitle) {
+				currentSubtitle.textContent = slides[current].getAttribute('data-subtitle') || '';
+				currentSubtitle.hidden = currentSubtitle.textContent.trim() === '';
+			}
+
+			if (currentDescription) {
+				currentDescription.textContent = slides[current].getAttribute('data-description') || '';
+			}
+		}
+
+		function goTo(index) {
+			if (!slides.length || !Number.isFinite(index)) {
+				return;
+			}
+
+			current = ((index % slides.length) + slides.length) % slides.length;
+			render();
+		}
+
+		function stopTimer() {
+			if (timer) {
+				window.clearInterval(timer);
+				timer = null;
+			}
+		}
+
+		function startTimer() {
+			if (reduceMotion || slides.length < 2) {
+				return;
+			}
+
+			stopTimer();
+			timer = window.setInterval(function () {
+				goTo(current + 1);
+			}, 5000);
+		}
+
+		archive.addEventListener('click', function (event) {
+			var dot = event.target && event.target.closest('[data-draft-magazines-dot]');
+
+			if (!dot || !archive.contains(dot)) {
+				return;
+			}
+
+			event.preventDefault();
+			goTo(parseInt(dot.getAttribute('data-draft-magazines-index') || dot.getAttribute('data-draft-magazines-dot'), 10));
+			startTimer();
 		});
+
+		archive.addEventListener('mouseenter', stopTimer);
+		archive.addEventListener('mouseleave', startTimer);
+
+		render();
+		startTimer();
 	}
 
-	if (next) {
-		next.addEventListener('click', function () {
-			goTo(current + 1);
-		});
+	function bootMagazineArchives() {
+		Array.prototype.forEach.call(document.querySelectorAll('[data-draft-magazines-featured]'), initMagazineArchive);
 	}
 
-	window.addEventListener('resize', render, { passive: true });
-	render();
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', bootMagazineArchives, { once: true });
+	} else {
+		bootMagazineArchives();
+	}
 }());
 
 (function () {
@@ -438,3 +466,116 @@
 	render();
 	startTimer();
 }());
+
+(function () {
+	'use strict';
+
+	function initCoversCarousel(carousel) {
+		var slides = Array.prototype.slice.call(carousel.querySelectorAll('[data-draft-covers-slide]'));
+		var dots = Array.prototype.slice.call(carousel.querySelectorAll('[data-draft-covers-dot]'));
+		var current = 0;
+		var previous = null;
+		var locked = false;
+		var timer = null;
+		var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		var duration = 650;
+
+		if (!slides.length || !dots.length) {
+			return;
+		}
+
+		slides.forEach(function (slide, index) {
+			slide.setAttribute('data-draft-covers-index', String(index));
+		});
+
+		dots.forEach(function (dot, index) {
+			dot.setAttribute('data-draft-covers-index', String(index));
+			dot.setAttribute('aria-controls', 'draft-covers-slide-' + index);
+			if (!dot.hasAttribute('aria-label')) {
+				dot.setAttribute('aria-label', 'Show cover ' + (index + 1));
+			}
+		});
+
+		function render(isAnimated) {
+			slides.forEach(function (slide, index) {
+				slide.id = slide.id || 'draft-covers-slide-' + index;
+				slide.classList.toggle('is-active', index === current);
+				slide.classList.toggle('is-previous', previous === index && isAnimated && !reduceMotion);
+				slide.classList.toggle('is-entering', index === current && isAnimated && !reduceMotion);
+				slide.setAttribute('aria-hidden', index === current ? 'false' : 'true');
+			});
+
+			dots.forEach(function (dot, index) {
+				var isActive = index === current;
+				dot.classList.toggle('is-active', isActive);
+				dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+				dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+			});
+		}
+
+		function goTo(index, isUserAction) {
+			if (!slides.length || locked) {
+				return;
+			}
+
+			var next = ((index % slides.length) + slides.length) % slides.length;
+
+			if (next === current) {
+				if (isUserAction) {
+					startTimer();
+				}
+				return;
+			}
+
+			previous = current;
+			current = next;
+			locked = true;
+			render(true);
+
+			window.setTimeout(function () {
+				previous = null;
+				locked = false;
+				render(false);
+			}, reduceMotion ? 0 : duration + 60);
+		}
+
+		function stopTimer() {
+			if (timer) {
+				window.clearInterval(timer);
+				timer = null;
+			}
+		}
+
+		function startTimer() {
+			if (reduceMotion || slides.length < 2) {
+				return;
+			}
+
+			stopTimer();
+			timer = window.setInterval(function () {
+				goTo(current + 1, false);
+			}, 4500);
+		}
+
+		carousel.addEventListener('click', function (event) {
+			var dot = event.target && event.target.closest('[data-draft-covers-dot]');
+
+			if (!dot || !carousel.contains(dot)) {
+				return;
+			}
+
+			event.preventDefault();
+			goTo(parseInt(dot.getAttribute('data-draft-covers-index'), 10), true);
+			startTimer();
+		});
+
+		carousel.addEventListener('mouseenter', stopTimer);
+		carousel.addEventListener('mouseleave', startTimer);
+
+		render(false);
+		startTimer();
+	}
+
+	Array.prototype.forEach.call(document.querySelectorAll('[data-draft-covers-carousel]'), initCoversCarousel);
+}());
+

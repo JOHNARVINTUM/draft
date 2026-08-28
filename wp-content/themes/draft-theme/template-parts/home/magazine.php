@@ -74,7 +74,7 @@ $draft_logo = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 		</div>
 
 		<div class="draft-home-magazine__view">
-			<a class="draft-home-text-link" href="<?php echo esc_url( get_permalink( $draft_issues[0] ) ); ?>" data-draft-home-magazine-link><?php esc_html_e( 'View Issue', 'draft-theme' ); ?> &rarr;</a>
+			<a class="draft-home-text-link" href="<?php echo esc_url( get_permalink( $draft_issues[0] ) ); ?>" data-draft-home-magazine-link><?php esc_html_e( 'View Issue', 'draft-theme' ); ?><svg class="draft-home-cta-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
 		</div>
 	</div>
 </section>

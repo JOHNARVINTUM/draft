@@ -129,7 +129,7 @@ $draft_slides = array_slice( $draft_slides, 0, 6 );
 						<span><?php echo esc_html( $draft_slide['badge'] ); ?></span>
 						<h1><?php echo esc_html( $draft_slide['title'] ); ?></h1>
 						<p><?php echo esc_html( wp_strip_all_tags( $draft_slide['subtitle'] ) ); ?></p>
-						<span class="draft-home-hero__cta"><?php esc_html_e( 'Explore Articles', 'draft-theme' ); ?></span>
+						<span class="draft-home-hero__cta"><?php esc_html_e( 'Explore Articles', 'draft-theme' ); ?><svg class="draft-home-cta-arrow draft-home-cta-arrow--hero" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
 					</div>
 				</div>
 			</div>
