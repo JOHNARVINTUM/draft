@@ -5673,64 +5673,116 @@ body.admin-bar .draft-mobile-menu {
 
 @media (max-width: 900px) {
 	.draft-covers-final__hero-inner {
-		grid-template-columns: 1fr;
-		gap: 34px;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: clamp(18px, 5vw, 44px);
 	}
 
-	.draft-covers-final__hero-cover {
-		max-width: 420px;
+	.draft-covers-final__hero-cover,
+	.draft-covers-final__intro {
+		min-width: 0;
 	}
 
 	.draft-covers-previous-grid {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(24px, 4vw, 36px) clamp(14px, 3vw, 22px);
 	}
 }
 
 @media (max-width: 767px) {
 	.draft-covers-final__hero {
-		padding: 42px 0 46px;
+		padding: 34px 0 38px;
 	}
 
 	.draft-covers-final__hero-inner,
 	.draft-covers-final__inner {
-		padding-left: 24px;
-		padding-right: 24px;
+		padding-left: 18px;
+		padding-right: 18px;
+	}
+
+	.draft-covers-final__hero-inner {
+		gap: clamp(12px, 4vw, 18px);
 	}
 
 	.draft-covers-final__intro img {
-		height: 76px;
+		height: clamp(48px, 15vw, 58px);
+		transform: translateX(-6px);
 	}
 
 	.draft-covers-final__intro h1 {
-		font-size: 24px;
+		margin-bottom: 8px;
+		font-size: clamp(17px, 5vw, 20px);
+	}
+
+	.draft-covers-final__intro p {
+		max-width: 100%;
+		font-size: clamp(9px, 2.85vw, 11px);
+		line-height: 1.55;
 	}
 
 	.draft-covers-featured__slide.is-active,
 	.draft-covers-featured__slide.is-previous {
-		flex-direction: column;
+		flex-direction: row;
 	}
 
 	.draft-covers-featured__media {
-		padding: 18px 18px 0;
+		padding: 12px 0 12px 12px;
 	}
 
 	.draft-covers-featured__media img,
 	.draft-covers-featured__media .draft-cover-placeholder {
-		width: 100%;
+		width: clamp(86px, 29vw, 112px);
 	}
 
 	.draft-covers-featured__body {
-		padding: 24px 22px 22px;
+		min-width: 0;
+		padding: 18px 14px 14px;
+	}
+
+	.draft-covers-featured__body > strong {
+		font-size: clamp(13px, 3.8vw, 15px);
+		line-height: 1.22;
+	}
+
+	.draft-covers-featured__description {
+		font-size: clamp(9px, 2.75vw, 10px);
+		line-height: 1.55;
 	}
 
 	.draft-covers-featured__meta {
-		align-items: flex-start;
-		flex-direction: column;
+		align-items: flex-end;
+		flex-direction: row;
 		gap: 8px;
 	}
 
+	.draft-covers-featured__meta span,
+	.draft-covers-featured__meta time {
+		font-size: 8px;
+	}
+
 	.draft-covers-previous-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 22px 10px;
+	}
+
+	.draft-covers-final .draft-cover-card__image {
+		margin-bottom: 8px;
+	}
+
+	.draft-covers-final .draft-cover-card__logo {
+		right: 7px;
+		bottom: 7px;
+		height: 8px;
+	}
+
+	.draft-covers-final .draft-cover-card__body strong {
+		margin-bottom: 4px;
+		font-size: clamp(9px, 2.7vw, 11px);
+		letter-spacing: .08em;
+	}
+
+	.draft-covers-final .draft-cover-card__body span {
+		font-size: clamp(8px, 2.4vw, 9px);
+		line-height: 1.45;
 	}
 }
 
