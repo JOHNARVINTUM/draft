@@ -58,10 +58,11 @@ if ( ! function_exists( 'draft_theme_is_primary_nav_item_active' ) ) {
 	}
 }
 
-$draft_is_articles_area = is_page( 'articles' ) || is_singular( 'post' );
-$draft_selected_cat     = draft_theme_get_selected_article_category();
-$draft_search_query     = draft_theme_get_article_search_query();
-$logo_url               = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
+$draft_is_articles_area         = is_page( 'articles' ) || is_singular( 'post' );
+$draft_selected_cat             = draft_theme_get_selected_article_category();
+$draft_search_query             = draft_theme_get_article_search_query();
+$draft_is_article_results_mode  = is_page( 'articles' ) && ( $draft_selected_cat instanceof WP_Term || '' !== $draft_search_query );
+$logo_url                       = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Business' );
 ?>
 <!doctype html>
@@ -101,24 +102,6 @@ $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Bu
 			</div>
 		</div>
 	</header>
-
-	<?php if ( $draft_is_articles_area ) : ?>
-		<div class="draft-article-nav">
-			<nav class="draft-article-nav__cats" aria-label="<?php esc_attr_e( 'Article categories', 'draft-theme' ); ?>">
-				<?php foreach ( $draft_categories as $category_name ) : ?>
-					<?php $is_active_cat = $draft_selected_cat instanceof WP_Term && strtolower( $draft_selected_cat->name ) === strtolower( $category_name ); ?>
-					<a class="<?php echo $is_active_cat ? 'is-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'category', $category_name, draft_theme_get_article_archive_url() ) ); ?>"><?php echo esc_html( $category_name ); ?></a>
-				<?php endforeach; ?>
-			</nav>
-			<form class="draft-article-nav__search" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get">
-				<label class="screen-reader-text" for="draft-article-search"><?php esc_html_e( 'Search articles', 'draft-theme' ); ?></label>
-				<input id="draft-article-search" type="search" name="search" value="<?php echo esc_attr( $draft_search_query ); ?>" placeholder="<?php esc_attr_e( 'Search articles...', 'draft-theme' ); ?>">
-				<button type="submit" aria-label="<?php esc_attr_e( 'Search', 'draft-theme' ); ?>">
-					<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-				</button>
-			</form>
-		</div>
-	<?php endif; ?>
 
 	<nav id="draft-mobile-menu" class="draft-mobile-menu" aria-label="<?php esc_attr_e( 'Mobile navigation', 'draft-theme' ); ?>" hidden data-draft-mobile-menu>
 		<div class="draft-mobile-menu__links">

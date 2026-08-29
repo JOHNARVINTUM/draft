@@ -20,7 +20,7 @@ function draft_theme_get_article_archive_url( $args = array() ) {
 }
 
 function draft_theme_get_article_categories() {
-	$names = array( 'Fashion', 'Beauty', 'Business', 'Sports', 'Lifestyle' );
+	$names = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Business' );
 	$items = array();
 
 	foreach ( $names as $name ) {
