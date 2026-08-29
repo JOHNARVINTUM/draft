@@ -348,12 +348,24 @@
 	var prev = carousel.querySelector('[data-draft-home-magazine-prev]');
 	var next = carousel.querySelector('[data-draft-home-magazine-next]');
 	var activeLink = carousel.querySelector('[data-draft-home-magazine-link]');
+	var stage = carousel.querySelector('.draft-home-magazine__stage');
 	var current = 0;
 	var timer = null;
 	var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	function getStep() {
-		return window.matchMedia && window.matchMedia('(max-width: 767px)').matches ? 155 : 200;
+		var source = stage || carousel;
+		var step = window.getComputedStyle(source).getPropertyValue('--draft-home-magazine-step');
+		var parsed = parseFloat(step);
+
+		if (Number.isFinite(parsed) && step.indexOf('clamp(') === -1 && step.indexOf('calc(') === -1) {
+			return parsed;
+		}
+
+		var activeSlide = carousel.querySelector('.draft-home-magazine__slide.is-center') || slides[0];
+		var slideWidth = activeSlide ? parseFloat(window.getComputedStyle(activeSlide).width) : 248;
+
+		return Math.min(200, Math.max(112, slideWidth * (200 / 248)));
 	}
 
 	function shortestOffset(index, active, len) {
