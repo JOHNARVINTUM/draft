@@ -17,7 +17,7 @@ $draft_blocks  = array();
 
 for ( $draft_i = 0; $draft_i < count( $draft_parts ); $draft_i += 2 ) {
 	$draft_block = $draft_parts[ $draft_i ] . ( $draft_parts[ $draft_i + 1 ] ?? '' );
-	if ( '' !== trim( wp_strip_all_tags( $draft_block ) ) ) {
+	if ( '' !== trim( wp_strip_all_tags( $draft_block ) ) || preg_match( '/<(?:img|figure|iframe|video|audio|embed|object)\\b/i', $draft_block ) ) {
 		$draft_blocks[] = $draft_block;
 	}
 }
