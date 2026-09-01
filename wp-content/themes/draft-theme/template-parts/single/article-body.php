@@ -11,9 +11,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $draft_post_id   = get_the_ID();
 $draft_mid_image = function_exists( 'draft_theme_get_article_mid_image' ) ? draft_theme_get_article_mid_image( $draft_post_id, 'large' ) : array();
-$draft_content = apply_filters( 'the_content', get_the_content() );
-$draft_parts   = preg_split( '/(<\/(?:p|blockquote|ul|ol|figure|h[2-6])>)/i', $draft_content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
-$draft_blocks  = array();
+$draft_content   = apply_filters( 'the_content', get_the_content() );
+$draft_allowed   = wp_kses_allowed_html( 'post' );
+$draft_allowed['iframe'] = array(
+	'src'             => true,
+	'width'           => true,
+	'height'          => true,
+	'frameborder'     => true,
+	'allow'           => true,
+	'allowfullscreen' => true,
+	'loading'         => true,
+	'referrerpolicy'  => true,
+	'title'           => true,
+	'class'           => true,
+	'id'              => true,
+	'style'           => true,
+);
+$draft_allowed['embed'] = array(
+	'src'             => true,
+	'width'           => true,
+	'height'          => true,
+	'type'            => true,
+	'class'           => true,
+	'id'              => true,
+	'allowfullscreen' => true,
+	'allow'           => true,
+	'style'           => true,
+);
+$draft_allowed['video'] = array_merge( $draft_allowed['video'] ?? array(), array( 'src' => true, 'controls' => true, 'autoplay' => true, 'muted' => true, 'loop' => true, 'playsinline' => true, 'poster' => true, 'width' => true, 'height' => true, 'class' => true, 'style' => true ) );
+$draft_allowed['source'] = array( 'src' => true, 'type' => true, 'media' => true );
+$draft_allowed['figure'] = array_merge( $draft_allowed['figure'] ?? array(), array( 'class' => true, 'style' => true ) );
+$draft_allowed['div'] = array_merge( $draft_allowed['div'] ?? array(), array( 'class' => true, 'style' => true ) );
+$draft_parts = preg_split( '/(<\/(?:p|blockquote|ul|ol|figure|h[2-6])>)/i', $draft_content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+$draft_blocks = array();
 
 for ( $draft_i = 0; $draft_i < count( $draft_parts ); $draft_i += 2 ) {
 	$draft_block = $draft_parts[ $draft_i ] . ( $draft_parts[ $draft_i + 1 ] ?? '' );
@@ -32,7 +62,7 @@ $draft_logo      = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 <div class="draft-single-detail__content">
 	<div class="draft-single-body draft-single-detail__body">
 		<?php foreach ( $draft_blocks as $draft_index => $draft_block ) : ?>
-			<?php echo wp_kses_post( $draft_block ); ?>
+			<?php echo wp_kses( $draft_block, $draft_allowed ); ?>
 			<?php if ( ! empty( $draft_mid_image['attachment_id'] ) && $draft_index + 1 === $draft_mid_index ) : ?>
 				<figure class="draft-single-detail__image draft-single-detail__image--mid">
 					<?php echo wp_get_attachment_image( $draft_mid_image['attachment_id'], 'large', false, array( 'alt' => $draft_mid_image['alt'] ) ); ?>

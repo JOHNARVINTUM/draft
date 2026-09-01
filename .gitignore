@@ -1,0 +1,14 @@
+# Local WordPress debug log
+/wp-content/debug.log
+
+# WordPress runtime and generated files
+/wp-content/cache/
+/wp-content/upgrade/
+
+# Uploaded media stays in WordPress/server storage
+/wp-content/uploads/
+
+# All-in-One WP Migration runtime and backup artifacts
+/wp-content/ai1wm-backups/
+/wp-content/plugins/all-in-one-wp-migration/
+*.wpress
