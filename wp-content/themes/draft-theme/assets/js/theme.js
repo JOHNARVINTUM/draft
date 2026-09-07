@@ -3,6 +3,8 @@
 
 	var toggle = document.querySelector('[data-draft-menu-toggle]');
 	var menu = document.querySelector('[data-draft-mobile-menu]');
+	var searchToggle = document.querySelector('[data-draft-search-toggle]');
+	var searchPanel = document.querySelector('[data-draft-mobile-search]');
 	var socialSidebar = document.querySelector('[data-draft-social-sidebar]');
 
 	function setMenuOpen(isOpen) {
@@ -40,6 +42,47 @@
 		document.addEventListener('keydown', function (event) {
 			if (event.key === 'Escape') {
 				setMenuOpen(false);
+			}
+		});
+	}
+
+	function setSearchOpen(isOpen) {
+		if (!searchToggle || !searchPanel) {
+			return;
+		}
+
+		searchToggle.classList.toggle('is-open', isOpen);
+		searchPanel.classList.toggle('is-open', isOpen);
+		document.body.classList.toggle('draft-search-open', isOpen);
+		searchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+		if (isOpen) {
+			searchPanel.removeAttribute('hidden');
+			window.setTimeout(function () {
+				var input = searchPanel.querySelector('input');
+				if (input) {
+					input.focus();
+				}
+			}, 120);
+		} else {
+			searchPanel.setAttribute('hidden', 'hidden');
+		}
+	}
+
+	if (searchToggle && searchPanel) {
+		searchToggle.addEventListener('click', function () {
+			setSearchOpen(!searchPanel.classList.contains('is-open'));
+		});
+
+		searchPanel.addEventListener('click', function (event) {
+			if (event.target && event.target.closest('a')) {
+				setSearchOpen(false);
+			}
+		});
+
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape') {
+				setSearchOpen(false);
 			}
 		});
 	}

@@ -99,9 +99,37 @@ $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Bu
 					<span class="draft-menu-toggle__line"></span>
 					<span class="screen-reader-text"><?php esc_html_e( 'Toggle menu', 'draft-theme' ); ?></span>
 				</button>
+
+				<button class="draft-header__search" type="button" aria-expanded="false" aria-controls="draft-mobile-search" aria-label="<?php esc_attr_e( 'Search articles', 'draft-theme' ); ?>" data-draft-search-toggle>
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg>
+					<span class="screen-reader-text"><?php esc_html_e( 'Search articles', 'draft-theme' ); ?></span>
+				</button>
 			</div>
 		</div>
 	</header>
+
+	<section id="draft-mobile-search" class="draft-mobile-search" aria-label="<?php esc_attr_e( 'Search articles', 'draft-theme' ); ?>" hidden data-draft-mobile-search>
+		<div class="draft-mobile-search__inner">
+			<form class="draft-mobile-search__form" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get">
+				<label for="draft-mobile-search-input"><?php esc_html_e( 'Search DRAFT', 'draft-theme' ); ?></label>
+				<div class="draft-mobile-search__field">
+					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Articles, covers, topics...', 'draft-theme' ); ?>">
+					<button type="submit" aria-label="<?php esc_attr_e( 'Submit search', 'draft-theme' ); ?>">
+						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg>
+					</button>
+				</div>
+			</form>
+
+			<div class="draft-mobile-search__categories">
+				<p><?php esc_html_e( 'Browse by category', 'draft-theme' ); ?></p>
+				<?php foreach ( $draft_categories as $draft_category ) : ?>
+					<a href="<?php echo esc_url( add_query_arg( 'category', $draft_category, draft_theme_get_article_archive_url() ) ); ?>">
+						<span><?php echo esc_html( $draft_category ); ?></span><span aria-hidden="true">&rarr;</span>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
 
 	<nav id="draft-mobile-menu" class="draft-mobile-menu" aria-label="<?php esc_attr_e( 'Mobile navigation', 'draft-theme' ); ?>" hidden data-draft-mobile-menu>
 		<div class="draft-mobile-menu__links">

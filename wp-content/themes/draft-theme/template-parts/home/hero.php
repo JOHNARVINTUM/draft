@@ -9,14 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$draft_logo       = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
-$draft_hero_image = DRAFT_THEME_URI . '/assets/images/draft-home-hero.png';
-$draft_featured_article = get_page_by_path( 'the-new-era-of-quiet-luxury', OBJECT, 'post' );
-$draft_posts      = get_posts(
+$draft_posts = get_posts(
 	array(
 		'post_type'      => 'post',
 		'post_status'    => 'publish',
 		'posts_per_page' => 3,
+		'ignore_sticky_posts' => false,
+		'orderby'        => 'date',
+		'order'          => 'DESC',
 		'meta_query'     => array(
 			array(
 				'key'     => '_thumbnail_id',
@@ -37,18 +37,9 @@ $draft_issues     = get_posts(
 	)
 );
 
-$draft_slides = array(
-	array(
-		'image_id'  => 0,
-		'image_url' => $draft_hero_image,
-		'url'       => $draft_featured_article instanceof WP_Post ? get_permalink( $draft_featured_article ) : draft_theme_get_article_archive_url(),
-		'badge'     => __( 'Where the Boys Play', 'draft-theme' ),
-		'title'     => __( 'The Modern Voice of Fashion, Business & Lifestyle', 'draft-theme' ),
-		'subtitle'  => __( 'Bold stories. Unfiltered perspectives. By fans, for fans.', 'draft-theme' ),
-	),
-);
 
 if ( ! empty( $draft_posts[0] ) ) {
+	$draft_slides = array();
 	$draft_slides[] = array(
 		'image_id'  => get_post_thumbnail_id( $draft_posts[0] ),
 		'image_url' => '',
@@ -57,6 +48,8 @@ if ( ! empty( $draft_posts[0] ) ) {
 		'title'     => get_the_title( $draft_posts[0] ),
 		'subtitle'  => get_the_excerpt( $draft_posts[0] ),
 	);
+} else {
+	$draft_slides = array();
 }
 
 if ( ! empty( $draft_issues[0] ) ) {
