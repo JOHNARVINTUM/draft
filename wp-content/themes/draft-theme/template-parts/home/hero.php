@@ -9,102 +9,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$draft_posts = get_posts(
+$draft_sticky_ids = array_filter( array_map( 'absint', (array) get_option( 'sticky_posts', array() ) ) );
+
+$draft_posts = $draft_sticky_ids ? get_posts(
 	array(
 		'post_type'      => 'post',
 		'post_status'    => 'publish',
-		'posts_per_page' => 3,
-		'ignore_sticky_posts' => false,
-		'orderby'        => 'date',
-		'order'          => 'DESC',
-		'meta_query'     => array(
-			array(
-				'key'     => '_thumbnail_id',
-				'compare' => 'EXISTS',
-			),
-		),
-	)
-);
-$draft_issues     = get_posts(
-	array(
-		'post_type'      => 'magazine_issue',
-		'post_status'    => 'publish',
-		'posts_per_page' => 3,
-		'meta_key'       => '_magazine_core_issue_number',
-		'orderby'        => 'meta_value_num',
-		'order'          => 'DESC',
+		'post__in'       => $draft_sticky_ids,
+		'posts_per_page' => -1,
+		'orderby'        => 'post__in',
 		'no_found_rows'  => true,
 	)
-);
+	) : array();
+$draft_slides = array();
 
-
-if ( ! empty( $draft_posts[0] ) ) {
-	$draft_slides = array();
+foreach ( $draft_posts as $draft_post ) {
+	$draft_image_id = get_post_thumbnail_id( $draft_post );
 	$draft_slides[] = array(
-		'image_id'  => get_post_thumbnail_id( $draft_posts[0] ),
-		'image_url' => '',
-		'url'       => get_permalink( $draft_posts[0] ),
+		'image_id'  => $draft_image_id,
+		'image_url' => $draft_image_id ? '' : DRAFT_THEME_URI . '/assets/images/draft-home-hero.png',
+		'url'       => get_permalink( $draft_post ),
 		'badge'     => __( 'Article', 'draft-theme' ),
-		'title'     => get_the_title( $draft_posts[0] ),
-		'subtitle'  => get_the_excerpt( $draft_posts[0] ),
-	);
-} else {
-	$draft_slides = array();
-}
-
-if ( ! empty( $draft_issues[0] ) ) {
-	$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issues[0] ) : null;
-	if ( $draft_issue_data ) {
-		$draft_slides[] = array(
-			'image_id'  => (int) $draft_issue_data['cover_image_id'],
-			'image_url' => '',
-			'url'       => home_url( '/covers/' . $draft_issues[0]->post_name . '/' ),
-			'badge'     => __( 'Cover', 'draft-theme' ),
-			'title'     => $draft_issue_data['title'],
-			'subtitle'  => $draft_issue_data['subtitle'] ?: $draft_issue_data['publication_date'],
-		);
-	}
-}
-
-if ( ! empty( $draft_issues[1] ) ) {
-	$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issues[1] ) : null;
-	if ( $draft_issue_data ) {
-		$draft_slides[] = array(
-			'image_id'  => (int) $draft_issue_data['cover_image_id'],
-			'image_url' => '',
-			'url'       => get_permalink( $draft_issues[1] ),
-			'badge'     => __( 'Magazine', 'draft-theme' ),
-			'title'     => $draft_issue_data['title'],
-			'subtitle'  => $draft_issue_data['subtitle'] ?: $draft_issue_data['publication_date'],
-		);
-	}
-}
-
-if ( ! empty( $draft_posts[1] ) ) {
-	$draft_slides[] = array(
-		'image_id'  => get_post_thumbnail_id( $draft_posts[1] ),
-		'image_url' => '',
-		'url'       => get_permalink( $draft_posts[1] ),
-		'badge'     => __( 'Article', 'draft-theme' ),
-		'title'     => get_the_title( $draft_posts[1] ),
-		'subtitle'  => get_the_excerpt( $draft_posts[1] ),
+		'title'     => get_the_title( $draft_post ),
+		'subtitle'  => get_the_excerpt( $draft_post ),
 	);
 }
-
-if ( ! empty( $draft_issues[2] ) ) {
-	$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issues[2] ) : null;
-	if ( $draft_issue_data ) {
-		$draft_slides[] = array(
-			'image_id'  => (int) $draft_issue_data['cover_image_id'],
-			'image_url' => '',
-			'url'       => home_url( '/covers/' . $draft_issues[2]->post_name . '/' ),
-			'badge'     => __( 'Cover', 'draft-theme' ),
-			'title'     => $draft_issue_data['title'],
-			'subtitle'  => $draft_issue_data['subtitle'] ?: $draft_issue_data['publication_date'],
-		);
-	}
-}
-$draft_slides = array_slice( $draft_slides, 0, 6 );
 ?>
 <section class="draft-home-hero" data-draft-home-hero>
 	<?php foreach ( $draft_slides as $draft_index => $draft_slide ) : ?>

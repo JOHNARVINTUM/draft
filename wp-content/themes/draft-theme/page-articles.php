@@ -30,7 +30,17 @@ if ( '' !== $draft_search_query ) {
 }
 
 $draft_articles = new WP_Query( $draft_query_args );
-$draft_featured = function_exists( 'magazine_core_get_hero_posts' ) ? magazine_core_get_hero_posts( 9 ) : array();
+$draft_featured = get_posts(
+	array(
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => -1,
+		'orderby'             => 'date',
+		'order'               => 'DESC',
+		'ignore_sticky_posts' => true,
+		'no_found_rows'       => true,
+	)
+);
 ?>
 <section class="draft-articles-page<?php echo $draft_is_results_mode ? ' is-results-mode' : ''; ?>">
 	<div class="draft-articles-page__inner">
