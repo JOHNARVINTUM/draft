@@ -3819,9 +3819,12 @@ body.admin-bar .draft-mobile-menu {
 }
 
 .draft-home-article-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .draft-home-article-card {
@@ -3844,11 +3847,12 @@ body.admin-bar .draft-mobile-menu {
 }
 
 .draft-home-article-card__media {
-	position: relative;
-	flex-shrink: 0;
-	overflow: hidden;
-	aspect-ratio: 3 / 4;
-	background: #E4E4DF;
+    position: relative;
+    flex-shrink: 0;
+    height: clamp(240px, 26vw, 300px);
+    overflow: hidden;
+    aspect-ratio: auto;
+    background: #E4E4DF;
 }
 
 .draft-home-article-card__media img,
@@ -8338,3 +8342,4 @@ body.admin-bar .draft-mobile-menu {
 		display: none;
 	}
 }
+
