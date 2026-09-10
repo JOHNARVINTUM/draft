@@ -16,6 +16,7 @@ define( 'DRAFT_THEME_URI', get_template_directory_uri() );
 require_once DRAFT_THEME_PATH . '/inc/setup.php';
 require_once DRAFT_THEME_PATH . '/inc/enqueue.php';
 require_once DRAFT_THEME_PATH . '/inc/articles.php';
+require_once DRAFT_THEME_PATH . '/inc/about.php';
 
 
 /**

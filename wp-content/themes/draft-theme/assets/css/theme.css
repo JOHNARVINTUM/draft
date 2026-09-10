@@ -2241,6 +2241,48 @@ img {
 	color: #444444;
 }
 
+.draft-about-intro__content p + p,
+.draft-about-intro__content ul,
+.draft-about-intro__content ol,
+.draft-about-intro__content figure,
+.draft-about-intro__content h2,
+.draft-about-intro__content h3 {
+	margin-top: 1.25em;
+}
+
+.draft-about-intro__content a {
+	color: var(--draft-primary);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.draft-about-intro__content img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+.draft-about-intro__content .aligncenter {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.draft-about-intro__content .alignleft {
+	float: left;
+	margin: 0 20px 14px 0;
+}
+
+.draft-about-intro__content .alignright {
+	float: right;
+	margin: 0 0 14px 20px;
+}
+
+.draft-about-intro__content::after {
+	display: block;
+	clear: both;
+	content: "";
+}
+
 .draft-about-featured {
 	padding: 52px 40px;
 	background: #E8E8E4;
