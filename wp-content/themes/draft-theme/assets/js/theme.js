@@ -6,6 +6,7 @@
 	var searchToggle = document.querySelector('[data-draft-search-toggle]');
 	var searchPanel = document.querySelector('[data-draft-mobile-search]');
 	var socialSidebar = document.querySelector('[data-draft-social-sidebar]');
+	var header = document.querySelector("[data-draft-header]");
 
 	function setMenuOpen(isOpen) {
 		if (!toggle || !menu) {
@@ -46,28 +47,69 @@
 		});
 	}
 
-	function setSearchOpen(isOpen) {
-		if (!searchToggle || !searchPanel) {
-			return;
-		}
-
-		searchToggle.classList.toggle('is-open', isOpen);
-		searchPanel.classList.toggle('is-open', isOpen);
-		document.body.classList.toggle('draft-search-open', isOpen);
-		searchToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-
-		if (isOpen) {
-			searchPanel.removeAttribute('hidden');
-			window.setTimeout(function () {
-				var input = searchPanel.querySelector('input');
-				if (input) {
-					input.focus();
-				}
-			}, 120);
-		} else {
-			searchPanel.setAttribute('hidden', 'hidden');
-		}
+	function updateSearchPanelPosition() {
+	if (!header || !searchPanel || !searchToggle) {
+		return;
 	}
+
+	var headerBottom = Math.ceil(
+		header.getBoundingClientRect().bottom
+	);
+
+	var searchButtonPosition = searchToggle.getBoundingClientRect();
+    var panelRight = Math.max(24,window.innerWidth - searchButtonPosition.right
+    );
+
+	searchPanel.style.setProperty(
+		"--draft-search-panel-top",
+		headerBottom + "px"
+	);
+
+	searchPanel.style.setProperty(
+	"--draft-search-panel-right",
+	panelRight + "px"
+    );
+}
+
+function setSearchOpen(isOpen) {
+	if (!searchToggle || !searchPanel) {
+		return;
+	}
+
+	searchToggle.setAttribute(
+		"aria-expanded",
+		isOpen ? "true" : "false"
+	);
+
+	if (isOpen) {
+		updateSearchPanelPosition();
+		searchPanel.removeAttribute("hidden");
+
+		window.requestAnimationFrame(function () {
+			searchToggle.classList.add("is-open");
+			searchPanel.classList.add("is-open");
+			document.body.classList.add("draft-search-open");
+		});
+
+		window.setTimeout(function () {
+			var input = searchPanel.querySelector("input");
+
+			if (input) {
+				input.focus();
+			}
+		}, 220);
+	} else {
+		searchToggle.classList.remove("is-open");
+		searchPanel.classList.remove("is-open");
+		document.body.classList.remove("draft-search-open");
+
+		window.setTimeout(function () {
+			if (!searchPanel.classList.contains("is-open")) {
+				searchPanel.setAttribute("hidden", "hidden");
+			}
+		}, 220);
+	}
+}
 
 	if (searchToggle && searchPanel) {
 		searchToggle.addEventListener('click', function () {
@@ -85,6 +127,27 @@
 				setSearchOpen(false);
 			}
 		});
+
+		window.addEventListener("resize", updateSearchPanelPosition);
+
+document.addEventListener("click", function (event) {
+	if (
+		!searchPanel ||
+		!searchToggle ||
+		!searchPanel.classList.contains("is-open")
+	) {
+		return;
+	}
+
+	if (
+		searchPanel.contains(event.target) ||
+		searchToggle.contains(event.target)
+	) {
+		return;
+	}
+
+	setSearchOpen(false);
+        });
 	}
 
 	function updateSocialSidebar() {
@@ -634,3 +697,123 @@
 	Array.prototype.forEach.call(document.querySelectorAll('[data-draft-covers-carousel]'), initCoversCarousel);
 }());
 
+(function () {
+	"use strict";
+
+	var emptyState = document.querySelector(
+		".draft-articles-page.is-results-mode .draft-articles-empty"
+	);
+
+	if (!emptyState) {
+		return;
+	}
+
+	var searchForm = document.querySelector(".draft-article-nav__search");
+	var searchInput = document.querySelector("#draft-article-search");
+	var searchTerm = searchInput ? searchInput.value.trim() : "";
+
+	var icon = document.createElement("span");
+	var title = document.createElement("h2");
+	var message = document.createElement("p");
+	var clearLink = document.createElement("a");
+
+	icon.className = "draft-articles-empty__icon";
+	icon.setAttribute("aria-hidden", "true");
+
+	title.className = "draft-articles-empty__title";
+	title.textContent = "No results found";
+
+	message.className = "draft-articles-empty__message";
+	message.textContent = searchTerm
+		? "We couldn’t find any articles matching “" + searchTerm + "”."
+		: "We couldn’t find any articles matching your filters.";
+
+	clearLink.className = "draft-articles-empty__clear";
+	clearLink.href = searchForm ? searchForm.action : window.location.pathname;
+	clearLink.textContent = "Clear Search";
+
+	emptyState.textContent = "";
+	emptyState.appendChild(icon);
+	emptyState.appendChild(title);
+	emptyState.appendChild(message);
+	emptyState.appendChild(clearLink);
+}());
+
+(function () {
+    'use strict';
+
+    var form = document.querySelector('[data-draft-global-search-form]');
+    var input = document.querySelector('[data-draft-global-search-input]');
+    var results = document.querySelector('[data-draft-global-search-results]');
+    var cards = results
+        ? Array.prototype.slice.call(
+            results.querySelectorAll('[data-draft-global-search-card]')
+        )
+        : [];
+    var emptyState = document.querySelector('[data-draft-global-search-empty]');
+    var emptyMessage = document.querySelector(
+        '[data-draft-global-search-empty-message]'
+    );
+    var clearButton = document.querySelector('[data-draft-global-search-clear]');
+
+    if (!form || !input || !results || !emptyState) {
+        return;
+    }
+
+    function isDesktopOrIPad() {
+        return window.matchMedia('(min-width: 768px)').matches;
+    }
+
+    function filterSearchCards() {
+        if (!isDesktopOrIPad()) {
+            results.hidden = true;
+            emptyState.hidden = true;
+            return;
+        }
+
+        var searchTerm = input.value.trim().toLowerCase();
+        var visibleCards = 0;
+
+        cards.forEach(function (card) {
+            var cardText = (card.getAttribute('data-search-text') || '').toLowerCase();
+            var matches = searchTerm === '' || cardText.indexOf(searchTerm) !== -1;
+
+            card.hidden = !matches;
+
+            if (matches) {
+                visibleCards += 1;
+            }
+        });
+
+        var hasNoResults = searchTerm !== '' && visibleCards === 0;
+
+        results.hidden = hasNoResults;
+        emptyState.hidden = !hasNoResults;
+
+        if (hasNoResults && emptyMessage) {
+            emptyMessage.textContent =
+                'We couldn’t find any articles, covers, or magazines matching “' +
+                input.value.trim() +
+                '”.';
+        }
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        filterSearchCards();
+    });
+
+    input.addEventListener('input', filterSearchCards);
+
+    if (clearButton) {
+        clearButton.addEventListener('click', function () {
+            input.value = '';
+            filterSearchCards();
+            input.focus();
+        });
+    }
+
+    window.addEventListener('resize', filterSearchCards);
+
+    filterSearchCards();
+}());

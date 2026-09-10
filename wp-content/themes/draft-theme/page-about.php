@@ -34,7 +34,7 @@ $draft_strip_issues = get_posts(
 	array(
 		'post_type'      => 'magazine_issue',
 		'post_status'    => 'publish',
-		'posts_per_page' => 4,
+		'posts_per_page' => 5,
 		'meta_key'       => '_magazine_core_issue_number',
 		'orderby'        => 'meta_value_num',
 		'order'          => 'DESC',
@@ -116,14 +116,6 @@ $draft_category_links = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Busi
 
 	<section class="draft-about-strip" aria-label="<?php esc_attr_e( 'Magazine covers', 'draft-theme' ); ?>">
 		<?php foreach ( $draft_strip_issues as $draft_strip_index => $draft_issue ) : ?>
-			<?php if ( 3 === $draft_strip_index ) : ?>
-				<div class="draft-about-strip__quote">
-					<div class="draft-about-strip__mark" aria-hidden="true">&quot;</div>
-					<p><?php esc_html_e( 'I TRAIN HARD TO BE THE BEST ME - ALWAYS ONE STEP AHEAD, JUST FOR YOU.', 'draft-theme' ); ?></p>
-					<div class="draft-about-strip__bars" aria-hidden="true"><span></span><span></span><span></span></div>
-					<img src="<?php echo esc_url( $draft_logo ); ?>" alt="<?php esc_attr_e( 'draft', 'draft-theme' ); ?>">
-				</div>
-			<?php endif; ?>
 			<?php
 			$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issue ) : null;
 			$draft_cover_id   = $draft_issue_data ? (int) $draft_issue_data['cover_image_id'] : get_post_thumbnail_id( $draft_issue );

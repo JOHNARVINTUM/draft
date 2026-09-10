@@ -64,7 +64,34 @@ $draft_search_query             = draft_theme_get_article_search_query();
 $draft_is_article_results_mode  = is_page( 'articles' ) && ( $draft_selected_cat instanceof WP_Term || '' !== $draft_search_query );
 $logo_url                       = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Business' );
-?>
+
+
+$draft_header_search_articles = get_posts(
+    array(
+        'post_type'           => 'post',
+        'post_status'         => 'publish',
+        'posts_per_page'      => -1,
+        'orderby'             => 'date',
+        'order'               => 'DESC',
+        'ignore_sticky_posts' => true,
+        'no_found_rows'       => true,
+    )
+);
+
+$draft_header_search_issues = post_type_exists( 'magazine_issue' )
+    ? get_posts(
+        array(
+            'post_type'      => 'magazine_issue',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'no_found_rows'  => true,
+        )
+    )
+    : array();
+	?>
+
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -110,16 +137,114 @@ $draft_categories       = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Bu
 
 	<section id="draft-mobile-search" class="draft-mobile-search" aria-label="<?php esc_attr_e( 'Search articles', 'draft-theme' ); ?>" hidden data-draft-mobile-search>
 		<div class="draft-mobile-search__inner">
-			<form class="draft-mobile-search__form" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get">
+			<form class="draft-mobile-search__form" action="" method="get" data-draft-global-search-form>
 				<label for="draft-mobile-search-input"><?php esc_html_e( 'Search DRAFT', 'draft-theme' ); ?></label>
 				<div class="draft-mobile-search__field">
-					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Articles, covers, topics...', 'draft-theme' ); ?>">
+					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Search Articles, Covers, Magazines...', 'draft-theme' ); ?>" autocomplete="off" data-draft-global-search-input>
 					<button type="submit" aria-label="<?php esc_attr_e( 'Submit search', 'draft-theme' ); ?>">
 						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg>
 					</button>
 				</div>
 			</form>
+<div class="draft-global-search-results" data-draft-global-search-results>
+    <?php global $post; ?>
 
+    <?php foreach ( $draft_header_search_articles as $draft_search_article ) : ?>
+        <?php
+        $post = $draft_search_article;
+        setup_postdata( $post );
+
+        $draft_search_text = strtolower(
+            wp_strip_all_tags(
+                get_the_title() . ' ' .
+                get_the_excerpt() . ' ' .
+                get_the_author() . ' article'
+            )
+        );
+        ?>
+
+        <div
+            class="draft-global-search-item"
+            data-draft-global-search-card
+            data-result-label="Article"
+            data-search-text="<?php echo esc_attr( $draft_search_text ); ?>"
+        >
+            <?php get_template_part( 'template-parts/articles/article-card' ); ?>
+        </div>
+    <?php endforeach; ?>
+
+    <?php wp_reset_postdata(); ?>
+
+    <?php foreach ( $draft_header_search_issues as $draft_search_index => $draft_search_issue ) : ?>
+        <?php
+        $draft_search_issue_data = function_exists( 'magazine_core_get_magazine_issue' )
+            ? magazine_core_get_magazine_issue( $draft_search_issue )
+            : null;
+
+        if ( ! $draft_search_issue_data ) {
+            continue;
+        }
+
+        $draft_search_issue_text = strtolower(
+            wp_strip_all_tags(
+                $draft_search_issue->post_title . ' ' .
+                get_the_excerpt( $draft_search_issue ) . ' ' .
+                $draft_search_issue_data['issue_label'] . ' ' .
+                $draft_search_issue_data['subtitle'] . ' magazine cover'
+            )
+        );
+        ?>
+
+        <div
+            class="draft-global-search-item"
+            data-draft-global-search-card
+            data-result-label="Cover"
+            data-search-text="<?php echo esc_attr( $draft_search_issue_text ); ?>"
+        >
+            <?php
+            get_template_part(
+                'template-parts/covers/cover-card',
+                null,
+                array(
+                    'issue' => $draft_search_issue,
+                    'index' => $draft_search_index,
+                    'logo'  => $logo_url,
+                )
+            );
+            ?>
+        </div>
+
+        <div
+            class="draft-global-search-item"
+            data-draft-global-search-card
+            data-result-label="Magazine"
+            data-search-text="<?php echo esc_attr( $draft_search_issue_text ); ?>"
+        >
+            <?php
+            get_template_part(
+                'template-parts/magazines/issue-card',
+                null,
+                array(
+                    'issue' => $draft_search_issue,
+                    'index' => $draft_search_index,
+                    'logo'  => $logo_url,
+                )
+            );
+            ?>
+        </div>
+    <?php endforeach; ?>
+</div>
+
+<div class="draft-global-search-empty" hidden data-draft-global-search-empty>
+    <span class="draft-articles-empty__icon" aria-hidden="true"></span>
+    <h2 class="draft-articles-empty__title">No results found</h2>
+    <p class="draft-articles-empty__message" data-draft-global-search-empty-message>
+        We couldn’t find any articles, covers, or magazines matching your search.
+    </p>
+    <button class="draft-articles-empty__clear" type="button" data-draft-global-search-clear>
+        Clear Search
+    </button>
+</div>
 			<div class="draft-mobile-search__categories">
 				<p><?php esc_html_e( 'Browse by category', 'draft-theme' ); ?></p>
 				<?php foreach ( $draft_categories as $draft_category ) : ?>
