@@ -137,7 +137,7 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
 
 	<section id="draft-mobile-search" class="draft-mobile-search" aria-label="<?php esc_attr_e( 'Search articles', 'draft-theme' ); ?>" hidden data-draft-mobile-search>
 		<div class="draft-mobile-search__inner">
-			<form class="draft-mobile-search__form" action="" method="get" data-draft-global-search-form>
+			<form class="draft-mobile-search__form" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get" data-draft-global-search-form>
 				<label for="draft-mobile-search-input"><?php esc_html_e( 'Search DRAFT', 'draft-theme' ); ?></label>
 				<div class="draft-mobile-search__field">
 					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Search Articles, Covers, Magazines...', 'draft-theme' ); ?>" autocomplete="off" data-draft-global-search-input>

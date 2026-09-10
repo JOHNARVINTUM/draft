@@ -799,6 +799,10 @@ document.addEventListener("click", function (event) {
     }
 
     form.addEventListener('submit', function (event) {
+        if (!isDesktopOrIPad()) {
+            return;
+        }
+
         event.preventDefault();
         filterSearchCards();
     });
