@@ -44,17 +44,87 @@ function draft_theme_get_about_content( $post_id ) {
  * Return an About image attachment and whether it has an explicit CMS value.
  *
  * @param int    $post_id About page ID.
- * @param string $position Main or bottom.
+ * @param string $position Main, legacy bottom, or bottom_1 through bottom_5.
  * @return array{id: int, is_set: bool}
  */
 function draft_theme_get_about_image( $post_id, $position ) {
-	$position = in_array( $position, array( 'main', 'bottom' ), true ) ? $position : 'main';
+	$positions = array( 'main', 'bottom', 'bottom_1', 'bottom_2', 'bottom_3', 'bottom_4', 'bottom_5' );
+	$position  = in_array( $position, $positions, true ) ? $position : 'main';
 	$meta_key = '_draft_about_' . $position . '_image_id';
 
 	return array(
 		'id'     => absint( get_post_meta( $post_id, $meta_key, true ) ),
 		'is_set' => metadata_exists( 'post', $post_id, $meta_key ),
 	);
+}
+
+/**
+ * Return the five effective lower-strip images.
+ *
+ * Unsaved fields retain the exact legacy composition: the optional legacy
+ * bottom image followed by issue covers ordered by issue number.
+ *
+ * @param int $post_id About page ID.
+ * @return array<int, array{id: int, alt: string, is_set: bool}>
+ */
+function draft_theme_get_about_bottom_images( $post_id ) {
+	$legacy_images = array();
+	$legacy_bottom = draft_theme_get_about_image( $post_id, 'bottom' );
+
+	if ( $legacy_bottom['id'] ) {
+		$legacy_images[] = array(
+			'id'  => $legacy_bottom['id'],
+			'alt' => trim( (string) get_post_meta( $legacy_bottom['id'], '_wp_attachment_image_alt', true ) ),
+		);
+	}
+
+	$issues = get_posts(
+		array(
+			'post_type'      => 'magazine_issue',
+			'post_status'    => 'publish',
+			'posts_per_page' => 5,
+			'meta_key'       => '_magazine_core_issue_number',
+			'orderby'        => 'meta_value_num',
+			'order'          => 'DESC',
+			'no_found_rows'  => true,
+		)
+	);
+
+	foreach ( $issues as $issue ) {
+		if ( count( $legacy_images ) >= 5 ) {
+			break;
+		}
+
+		$issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $issue ) : null;
+		$cover_id   = $issue_data ? (int) $issue_data['cover_image_id'] : get_post_thumbnail_id( $issue );
+		$title      = $issue_data ? $issue_data['title'] : get_the_title( $issue );
+		$legacy_images[] = array(
+			'id'  => $cover_id,
+			'alt' => sprintf( __( '%s cover', 'draft-theme' ), $title ),
+		);
+	}
+
+	$images = array();
+	for ( $index = 1; $index <= 5; $index++ ) {
+		$image = draft_theme_get_about_image( $post_id, 'bottom_' . $index );
+		if ( $image['is_set'] ) {
+			$images[] = array(
+				'id'     => $image['id'],
+				'alt'    => $image['id'] ? trim( (string) get_post_meta( $image['id'], '_wp_attachment_image_alt', true ) ) : '',
+				'is_set' => true,
+			);
+			continue;
+		}
+
+		$legacy = $legacy_images[ $index - 1 ] ?? array( 'id' => 0, 'alt' => '' );
+		$images[] = array(
+			'id'     => (int) $legacy['id'],
+			'alt'    => (string) $legacy['alt'],
+			'is_set' => false,
+		);
+	}
+
+	return $images;
 }
 
 /** Register About page metadata. */
@@ -91,7 +161,7 @@ function draft_theme_register_about_meta() {
 		);
 	}
 
-	foreach ( array( 'main_image_id', 'bottom_image_id' ) as $field ) {
+	foreach ( array( 'main_image_id', 'bottom_image_id', 'bottom_1_image_id', 'bottom_2_image_id', 'bottom_3_image_id', 'bottom_4_image_id', 'bottom_5_image_id' ) as $field ) {
 		register_post_meta(
 			'page',
 			'_draft_about_' . $field,
@@ -162,9 +232,9 @@ function draft_theme_render_about_image_control( $position, $label, $image_id ) 
  * @param WP_Post $post Current page.
  */
 function draft_theme_render_about_meta_box( $post ) {
-	$content      = draft_theme_get_about_content( $post->ID );
-	$main_image   = draft_theme_get_about_image( $post->ID, 'main' );
-	$bottom_image = draft_theme_get_about_image( $post->ID, 'bottom' );
+	$content       = draft_theme_get_about_content( $post->ID );
+	$main_image    = draft_theme_get_about_image( $post->ID, 'main' );
+	$bottom_images = draft_theme_get_about_bottom_images( $post->ID );
 
 	wp_nonce_field( 'draft_about_save', 'draft_about_nonce' );
 	?>
@@ -184,8 +254,11 @@ function draft_theme_render_about_meta_box( $post ) {
 	<?php draft_theme_render_about_image_control( 'main', __( 'Main Image', 'draft-theme' ), $main_image['id'] ); ?>
 	<p class="description"><?php esc_html_e( 'The full-width image at the top. The approved theme image remains the default until one is selected.', 'draft-theme' ); ?></p>
 	<hr>
-	<?php draft_theme_render_about_image_control( 'bottom', __( 'Bottom Image', 'draft-theme' ), $bottom_image['id'] ); ?>
-	<p class="description"><?php esc_html_e( 'The first image in the lower strip. If empty, the strip continues to use Magazine Issue covers.', 'draft-theme' ); ?></p>
+	<?php foreach ( $bottom_images as $index => $bottom_image ) : ?>
+		<?php draft_theme_render_about_image_control( 'bottom_' . ( $index + 1 ), sprintf( __( 'Bottom Image %d', 'draft-theme' ), $index + 1 ), $bottom_image['id'] ); ?>
+		<?php if ( $index < 4 ) : ?><hr><?php endif; ?>
+	<?php endforeach; ?>
+	<p class="description"><?php esc_html_e( 'Each image maps to the matching position in the lower strip. Removing an image hides that position without showing a broken image.', 'draft-theme' ); ?></p>
 	<?php
 }
 
@@ -213,7 +286,7 @@ function draft_theme_save_about_meta( $post_id ) {
 		update_post_meta( $post_id, '_draft_about_' . $field, $value );
 	}
 
-	foreach ( array( 'main', 'bottom' ) as $position ) {
+	foreach ( array( 'main', 'bottom_1', 'bottom_2', 'bottom_3', 'bottom_4', 'bottom_5' ) as $position ) {
 		$field         = 'draft_about_' . $position . '_image_id';
 		$attachment_id = isset( $_POST[ $field ] ) ? absint( $_POST[ $field ] ) : 0;
 		if ( $attachment_id && ! wp_attachment_is_image( $attachment_id ) ) {

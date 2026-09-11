@@ -18,7 +18,7 @@ $draft_about_fallback_hero = DRAFT_THEME_URI . '/assets/images/about-hero.png';
 $draft_about_page_id       = get_queried_object_id();
 $draft_about_content       = draft_theme_get_about_content( $draft_about_page_id );
 $draft_about_main_image    = draft_theme_get_about_image( $draft_about_page_id, 'main' );
-$draft_about_bottom_image  = draft_theme_get_about_image( $draft_about_page_id, 'bottom' );
+$draft_about_bottom_images = draft_theme_get_about_bottom_images( $draft_about_page_id );
 $draft_about_title_parts   = preg_split( '/\s+/', trim( $draft_about_content['title'] ), 2 );
 
 $draft_feature_posts = get_posts(
@@ -35,18 +35,6 @@ $draft_feature_posts = get_posts(
 	)
 );
 
-$draft_strip_issues = get_posts(
-	array(
-		'post_type'      => 'magazine_issue',
-		'post_status'    => 'publish',
-		'posts_per_page' => 5,
-		'meta_key'       => '_magazine_core_issue_number',
-		'orderby'        => 'meta_value_num',
-		'order'          => 'DESC',
-		'no_found_rows'  => true,
-	)
-);
-
 $draft_primary_links = array(
 	array( 'label' => __( 'Covers', 'draft-theme' ), 'url' => home_url( '/covers/' ) ),
 	array( 'label' => __( 'Magazine', 'draft-theme' ), 'url' => home_url( '/magazines/' ) ),
@@ -56,24 +44,14 @@ $draft_primary_links = array(
 $draft_category_links = array( 'Fashion', 'Beauty', 'Lifestyle', 'Sports', 'Business' );
 
 $draft_strip_images = array();
-if ( $draft_about_bottom_image['id'] ) {
-	$draft_strip_images[] = array(
-		'image_id' => $draft_about_bottom_image['id'],
-		'alt'      => trim( (string) get_post_meta( $draft_about_bottom_image['id'], '_wp_attachment_image_alt', true ) ) ?: $draft_about_content['subtitle'],
-	);
-}
-
-foreach ( $draft_strip_issues as $draft_issue ) {
-	if ( count( $draft_strip_images ) >= 5 ) {
-		break;
+foreach ( $draft_about_bottom_images as $draft_bottom_image ) {
+	if ( ! $draft_bottom_image['id'] ) {
+		continue;
 	}
 
-	$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issue ) : null;
-	$draft_cover_id   = $draft_issue_data ? (int) $draft_issue_data['cover_image_id'] : get_post_thumbnail_id( $draft_issue );
-	$draft_title      = $draft_issue_data ? $draft_issue_data['title'] : get_the_title( $draft_issue );
 	$draft_strip_images[] = array(
-		'image_id' => $draft_cover_id,
-		'alt'      => sprintf( __( '%s cover', 'draft-theme' ), $draft_title ),
+		'image_id' => $draft_bottom_image['id'],
+		'alt'      => $draft_bottom_image['alt'] ?: $draft_about_content['subtitle'],
 	);
 }
 ?>
