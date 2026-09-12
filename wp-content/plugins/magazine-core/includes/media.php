@@ -10,6 +10,9 @@ namespace Magazine_Core {
 		exit;
 	}
 
+	const IMAGE_OPTIMIZATION_MAX_DIMENSION = 2560;
+	const IMAGE_OPTIMIZATION_QUALITY       = 82;
+
 	/**
 	 * Return normalized post media data without rendering theme markup.
 	 *
@@ -50,57 +53,111 @@ namespace Magazine_Core {
 	}
 
 	/**
-	 * Convert oversized JPEG working images and sub-sizes to WebP.
+	 * Get or set the attachment currently in its initial upload generation pass.
 	 *
-	 * Smaller JPEGs are not converted because WordPress would retain the source
-	 * alongside a second full-size file. PNG and GIF files retain their source
-	 * formats to protect graphics, transparency, and animation.
+	 * @param int|null $attachment_id New value, or null to read it.
+	 * @return int
+	 */
+	function active_upload_attachment( $attachment_id = null ) {
+		static $active_attachment_id = 0;
+
+		if ( null !== $attachment_id ) {
+			$active_attachment_id = absint( $attachment_id );
+		}
+
+		return $active_attachment_id;
+	}
+
+	/**
+	 * Start optimization only when WordPress creates a new image attachment.
+	 *
+	 * @param int $attachment_id New attachment ID.
+	 */
+	function begin_new_upload_optimization( $attachment_id ) {
+		if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			return;
+		}
+
+		active_upload_attachment( $attachment_id );
+		add_filter( 'big_image_size_threshold', __NAMESPACE__ . '\\filter_new_upload_max_dimension', 10, 4 );
+		add_filter( 'image_editor_output_format', __NAMESPACE__ . '\\filter_new_upload_output_format', 10, 3 );
+		add_filter( 'wp_editor_set_quality', __NAMESPACE__ . '\\filter_new_upload_quality', 10, 2 );
+		add_filter( 'wp_generate_attachment_metadata', __NAMESPACE__ . '\\finish_new_upload_optimization', PHP_INT_MAX, 3 );
+	}
+	add_action( 'add_attachment', __NAMESPACE__ . '\\begin_new_upload_optimization' );
+
+	/**
+	 * Limit newly uploaded images to the approved longest-side dimension.
+	 *
+	 * @return int
+	 */
+	function filter_new_upload_max_dimension() {
+		return IMAGE_OPTIMIZATION_MAX_DIMENSION;
+	}
+
+	/**
+	 * Convert suitable new JPEG uploads and their responsive sizes to WebP.
 	 *
 	 * @param array  $formats Existing input-to-output MIME mappings.
 	 * @param string $filename Source filename.
 	 * @param string $mime_type Source MIME type.
 	 * @return array
 	 */
-	function filter_image_output_format( $formats, $filename, $mime_type ) {
-		static $convert_current_jpeg = false;
-
-		if ( 'image/jpeg' !== $mime_type ) {
-			return $formats;
-		}
-
-		if ( $filename && is_readable( $filename ) ) {
-			$image_size           = wp_getimagesize( $filename );
-			$convert_current_jpeg = $image_size && max( (int) $image_size[0], (int) $image_size[1] ) > 2560;
-		}
+	function filter_new_upload_output_format( $formats, $filename, $mime_type ) {
+		unset( $filename );
 
 		if (
-			! $convert_current_jpeg
-			|| ! wp_image_editor_supports(
+			active_upload_attachment()
+			&& 'image/jpeg' === $mime_type
+			&& wp_image_editor_supports(
 				array(
 					'mime_type'        => 'image/jpeg',
 					'output_mime_type' => 'image/webp',
 				)
 			)
 		) {
-			return $formats;
+			$formats['image/jpeg'] = 'image/webp';
 		}
 
-		$formats['image/jpeg'] = 'image/webp';
 		return $formats;
 	}
-	add_filter( 'image_editor_output_format', __NAMESPACE__ . '\\filter_image_output_format', 10, 3 );
 
 	/**
-	 * Use a conservative quality setting for generated WebP files.
+	 * Use one conservative quality setting for new WebP files.
 	 *
 	 * @param int    $quality Current quality.
 	 * @param string $mime_type Output MIME type.
 	 * @return int
 	 */
-	function filter_image_quality( $quality, $mime_type ) {
-		return 'image/webp' === $mime_type ? 82 : $quality;
+	function filter_new_upload_quality( $quality, $mime_type ) {
+		return active_upload_attachment() && 'image/webp' === $mime_type ? IMAGE_OPTIMIZATION_QUALITY : $quality;
 	}
-	add_filter( 'wp_editor_set_quality', __NAMESPACE__ . '\\filter_image_quality', 10, 2 );
+
+	/**
+	 * End the processing window after the new attachment's initial generation.
+	 *
+	 * @param array  $metadata Generated attachment metadata.
+	 * @param int    $attachment_id Attachment ID.
+	 * @param string $context Generation context.
+	 * @return array
+	 */
+	function finish_new_upload_optimization( $metadata, $attachment_id, $context ) {
+		if ( 'create' === $context && active_upload_attachment() === (int) $attachment_id ) {
+			stop_new_upload_optimization();
+		}
+
+		return $metadata;
+	}
+
+	/** Remove all request-scoped optimization filters. */
+	function stop_new_upload_optimization() {
+		remove_filter( 'big_image_size_threshold', __NAMESPACE__ . '\\filter_new_upload_max_dimension', 10 );
+		remove_filter( 'image_editor_output_format', __NAMESPACE__ . '\\filter_new_upload_output_format', 10 );
+		remove_filter( 'wp_editor_set_quality', __NAMESPACE__ . '\\filter_new_upload_quality', 10 );
+		remove_filter( 'wp_generate_attachment_metadata', __NAMESPACE__ . '\\finish_new_upload_optimization', PHP_INT_MAX );
+		active_upload_attachment( 0 );
+	}
+	add_action( 'shutdown', __NAMESPACE__ . '\\stop_new_upload_optimization' );
 }
 
 namespace {
