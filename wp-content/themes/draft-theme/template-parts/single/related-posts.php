@@ -15,7 +15,17 @@ $draft_is_article = 'article' === $draft_content_type;
 $draft_related    = $draft_is_article && function_exists( 'magazine_core_get_related_posts' ) ? magazine_core_get_related_posts( $draft_current_id, 3 ) : array();
 $draft_logo       = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 
-if ( ! $draft_is_article ) {
+if ( 'cover' === $draft_content_type ) {
+	$draft_related = get_posts(
+		draft_theme_get_cover_query_args(
+			array(
+				'posts_per_page' => 3,
+				'post__not_in'   => array( $draft_current_id ),
+				'no_found_rows'  => true,
+			)
+		)
+	);
+} elseif ( ! $draft_is_article ) {
 	$draft_related = get_posts(
 		array(
 			'post_type'      => 'magazine_issue',

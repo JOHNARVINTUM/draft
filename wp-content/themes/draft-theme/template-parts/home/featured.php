@@ -23,14 +23,11 @@ $draft_posts = get_posts(
 	)
 );
 $draft_issue = get_posts(
-	array(
-		'post_type'      => 'magazine_issue',
-		'post_status'    => 'publish',
+	draft_theme_get_cover_query_args(
+		array(
 		'posts_per_page' => 1,
-		'meta_key'       => '_magazine_core_issue_number',
-		'orderby'        => 'meta_value_num',
-		'order'          => 'DESC',
 		'no_found_rows'  => true,
+		)
 	)
 );
 $draft_primary = array(
