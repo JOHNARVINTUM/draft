@@ -105,6 +105,79 @@ function draft_theme_add_article_rewrite_rules() {
 }
 add_action( 'init', 'draft_theme_add_article_rewrite_rules' );
 
+/**
+ * Resolve a Cover detail URL to its backing Magazine Issue.
+ *
+ * @param WP $wp WordPress request object.
+ * @return void
+ */
+function draft_theme_route_cover_detail_request( $wp ) {
+	if ( ! $wp instanceof WP || ! preg_match( '#^covers/([^/]+)$#', trim( $wp->request, '/' ), $matches ) ) {
+		return;
+	}
+
+	$issue = get_page_by_path( sanitize_title( $matches[1] ), OBJECT, 'magazine_issue' );
+
+	if ( ! $issue instanceof WP_Post || 'publish' !== $issue->post_status ) {
+		return;
+	}
+
+	$wp->query_vars = array(
+		'post_type'          => 'magazine_issue',
+		'magazine_issue'     => $issue->post_name,
+		'name'               => $issue->post_name,
+		'draft_content_type' => 'cover',
+	);
+}
+add_action( 'parse_request', 'draft_theme_route_cover_detail_request', 1 );
+
+function draft_theme_add_content_type_query_var( $query_vars ) {
+	$query_vars[] = 'draft_content_type';
+	return $query_vars;
+}
+add_filter( 'query_vars', 'draft_theme_add_content_type_query_var' );
+
+function draft_theme_preserve_cover_detail_url( $redirect_url ) {
+	return 'cover' === get_query_var( 'draft_content_type' ) ? false : $redirect_url;
+}
+add_filter( 'redirect_canonical', 'draft_theme_preserve_cover_detail_url' );
+
+/**
+ * Return the selected record's presentation context.
+ *
+ * @param int|WP_Post|null $post Post ID or object.
+ * @return string
+ */
+function draft_theme_get_selected_content_type( $post = null ) {
+	if ( 'cover' === get_query_var( 'draft_content_type' ) ) {
+		return 'cover';
+	}
+
+	$post = get_post( $post );
+	return $post instanceof WP_Post && 'magazine_issue' === $post->post_type ? 'magazine' : 'article';
+}
+
+/**
+ * Return a permalink that preserves the selected presentation context.
+ *
+ * @param int|WP_Post $post Post ID or object.
+ * @param string      $content_type Presentation context.
+ * @return string
+ */
+function draft_theme_get_contextual_content_url( $post, $content_type ) {
+	$post = get_post( $post );
+
+	if ( ! $post instanceof WP_Post ) {
+		return '';
+	}
+
+	if ( 'cover' === $content_type && 'magazine_issue' === $post->post_type ) {
+		return home_url( '/covers/' . $post->post_name . '/' );
+	}
+
+	return get_permalink( $post );
+}
+
 function draft_theme_flush_article_rewrite_rules() {
 	draft_theme_add_article_rewrite_rules();
 	flush_rewrite_rules();
@@ -210,4 +283,3 @@ function draft_theme_save_article_mid_image_meta( $post_id ) {
 	}
 }
 add_action( 'save_post_post', 'draft_theme_save_article_mid_image_meta' );
-
