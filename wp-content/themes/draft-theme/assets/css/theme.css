@@ -6673,7 +6673,7 @@ body.admin-bar .draft-mobile-menu {
 .draft-covers-final__hero-cover > span {
 	display: block;
 	width: 100%;
-	aspect-ratio: 16 / 9;
+	aspect-ratio: 3 / 4;
 	height: auto;
 	object-fit: cover;
 	object-position: top center;
