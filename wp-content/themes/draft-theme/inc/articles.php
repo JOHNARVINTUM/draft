@@ -243,16 +243,19 @@ add_action( 'add_meta_boxes_post', 'draft_theme_add_article_mid_image_metabox' )
 
 function draft_theme_render_article_mid_image_metabox( $post ) {
 	$mid_image = draft_theme_get_article_mid_image( $post->ID, 'medium' );
+	$details   = function_exists( 'draft_theme_get_attachment_details_label' ) ? draft_theme_get_attachment_details_label( $mid_image['attachment_id'] ) : '';
 	wp_nonce_field( 'draft_article_mid_image_save', 'draft_article_mid_image_nonce' );
 	?>
 	<div class="draft-admin-mid-image" data-draft-admin-mid-image>
 		<p><?php esc_html_e( 'Optional portrait image displayed within the article detail layout.', 'draft-theme' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Recommended: 1200 x 1600 px', 'draft-theme' ); ?></p>
 		<input type="hidden" name="draft_article_mid_image" value="<?php echo esc_attr( (string) $mid_image['attachment_id'] ); ?>" data-draft-admin-mid-image-input>
 		<div class="draft-admin-mid-image__preview" data-draft-admin-mid-image-preview>
 			<?php if ( $mid_image['attachment_id'] ) : ?>
 				<?php echo wp_get_attachment_image( $mid_image['attachment_id'], 'medium', false, array( 'style' => 'max-width:100%;height:auto;display:block;' ) ); ?>
 			<?php endif; ?>
 		</div>
+		<p class="description" data-draft-admin-mid-image-details<?php echo $mid_image['attachment_id'] ? '' : ' hidden'; ?>><?php echo esc_html( sprintf( __( 'Selected: %s', 'draft-theme' ), $details ) ); ?></p>
 		<p>
 			<button type="button" class="button" data-draft-admin-mid-image-select><?php esc_html_e( 'Select Image', 'draft-theme' ); ?></button>
 			<button type="button" class="button" data-draft-admin-mid-image-remove<?php echo $mid_image['attachment_id'] ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove', 'draft-theme' ); ?></button>

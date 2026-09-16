@@ -18,6 +18,7 @@ require_once DRAFT_THEME_PATH . '/inc/enqueue.php';
 require_once DRAFT_THEME_PATH . '/inc/articles.php';
 require_once DRAFT_THEME_PATH . '/inc/covers.php';
 require_once DRAFT_THEME_PATH . '/inc/about.php';
+require_once DRAFT_THEME_PATH . '/inc/social-meta.php';
 
 
 /**

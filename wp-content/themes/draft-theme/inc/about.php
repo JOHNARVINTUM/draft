@@ -202,22 +202,51 @@ function draft_theme_add_about_meta_box( $post ) {
 add_action( 'add_meta_boxes_page', 'draft_theme_add_about_meta_box' );
 
 /**
+ * Return source dimensions and file size for a WordPress image attachment.
+ *
+ * @param int $image_id Selected attachment ID.
+ * @return string
+ */
+function draft_theme_get_attachment_details_label( $image_id ) {
+	$image_id = absint( $image_id );
+	if ( ! $image_id ) {
+		return '';
+	}
+
+	$metadata = wp_get_attachment_metadata( $image_id );
+	$width    = absint( $metadata['width'] ?? 0 );
+	$height   = absint( $metadata['height'] ?? 0 );
+	$file     = get_attached_file( $image_id );
+	$details  = $width && $height ? sprintf( '%d x %d px', $width, $height ) : '';
+
+	if ( $file && file_exists( $file ) ) {
+		$details .= $details ? ' - ' : '';
+		$details .= size_format( filesize( $file ), 1 );
+	}
+
+	return $details;
+}
+
+/**
  * Render a WordPress Media Library image control.
  *
  * @param string $position Main or bottom.
  * @param string $label Field label.
  * @param int    $image_id Selected attachment ID.
+ * @param string $recommended_dimensions Informational source image recommendation.
  */
-function draft_theme_render_about_image_control( $position, $label, $image_id ) {
+function draft_theme_render_about_image_control( $position, $label, $image_id, $recommended_dimensions ) {
 	?>
 	<div data-draft-admin-about-image>
 		<h3><?php echo esc_html( $label ); ?></h3>
+		<p class="description"><?php echo esc_html( sprintf( __( 'Recommended: %s', 'draft-theme' ), $recommended_dimensions ) ); ?></p>
 		<input type="hidden" name="draft_about_<?php echo esc_attr( $position ); ?>_image_id" value="<?php echo esc_attr( (string) $image_id ); ?>" data-draft-admin-about-image-input>
 		<div data-draft-admin-about-image-preview>
 			<?php if ( $image_id ) : ?>
 				<?php echo wp_get_attachment_image( $image_id, 'medium', false, array( 'style' => 'display:block;max-width:320px;height:auto;margin-bottom:10px;' ) ); ?>
 			<?php endif; ?>
 		</div>
+		<p class="description" data-draft-admin-about-image-details<?php echo $image_id ? '' : ' hidden'; ?>><?php echo esc_html( sprintf( __( 'Selected: %s', 'draft-theme' ), draft_theme_get_attachment_details_label( $image_id ) ) ); ?></p>
 		<p>
 			<button type="button" class="button" data-draft-admin-about-image-select><?php esc_html_e( 'Select or Upload Image', 'draft-theme' ); ?></button>
 			<button type="button" class="button" data-draft-admin-about-image-remove<?php echo $image_id ? '' : ' hidden'; ?>><?php esc_html_e( 'Remove Image', 'draft-theme' ); ?></button>
@@ -251,11 +280,11 @@ function draft_theme_render_about_meta_box( $post ) {
 		<tr><th scope="row"><label for="draft-about-brand-subtitle"><?php esc_html_e( 'Brand Subtitle', 'draft-theme' ); ?></label></th><td><input class="large-text" id="draft-about-brand-subtitle" name="draft_about_brand_subtitle" type="text" value="<?php echo esc_attr( $content['brand_subtitle'] ); ?>"></td></tr>
 	</table>
 	<hr>
-	<?php draft_theme_render_about_image_control( 'main', __( 'Main Image', 'draft-theme' ), $main_image['id'] ); ?>
+	<?php draft_theme_render_about_image_control( 'main', __( 'Main Image', 'draft-theme' ), $main_image['id'], '1600 x 900 px' ); ?>
 	<p class="description"><?php esc_html_e( 'The full-width image at the top. The approved theme image remains the default until one is selected.', 'draft-theme' ); ?></p>
 	<hr>
 	<?php foreach ( $bottom_images as $index => $bottom_image ) : ?>
-		<?php draft_theme_render_about_image_control( 'bottom_' . ( $index + 1 ), sprintf( __( 'Bottom Image %d', 'draft-theme' ), $index + 1 ), $bottom_image['id'] ); ?>
+		<?php draft_theme_render_about_image_control( 'bottom_' . ( $index + 1 ), sprintf( __( 'Bottom Image %d', 'draft-theme' ), $index + 1 ), $bottom_image['id'], '1200 x 1600 px' ); ?>
 		<?php if ( $index < 4 ) : ?><hr><?php endif; ?>
 	<?php endforeach; ?>
 	<p class="description"><?php esc_html_e( 'Each image maps to the matching position in the lower strip. Removing an image hides that position without showing a broken image.', 'draft-theme' ); ?></p>
