@@ -12,6 +12,7 @@ namespace Magazine_Core {
 
 	const IMAGE_OPTIMIZATION_MAX_DIMENSION = 2560;
 	const IMAGE_OPTIMIZATION_QUALITY       = 82;
+	const IMAGE_OPTIMIZATION_PENDING_META  = '_magazine_core_image_optimization_pending';
 
 	/**
 	 * Return normalized post media data without rendering theme markup.
@@ -78,13 +79,79 @@ namespace Magazine_Core {
 			return;
 		}
 
+		if ( 'image/jpeg' === get_post_mime_type( $attachment_id ) ) {
+			update_post_meta( $attachment_id, IMAGE_OPTIMIZATION_PENDING_META, '1' );
+		}
+
+		activate_upload_optimization( $attachment_id );
+	}
+	add_action( 'add_attachment', __NAMESPACE__ . '\\begin_new_upload_optimization' );
+
+	/**
+	 * Enable request-scoped image optimization for one attachment.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 */
+	function activate_upload_optimization( $attachment_id ) {
 		active_upload_attachment( $attachment_id );
 		add_filter( 'big_image_size_threshold', __NAMESPACE__ . '\\filter_new_upload_max_dimension', 10, 4 );
 		add_filter( 'image_editor_output_format', __NAMESPACE__ . '\\filter_new_upload_output_format', 10, 3 );
 		add_filter( 'wp_editor_set_quality', __NAMESPACE__ . '\\filter_new_upload_quality', 10, 2 );
 		add_filter( 'wp_generate_attachment_metadata', __NAMESPACE__ . '\\finish_new_upload_optimization', PHP_INT_MAX, 3 );
 	}
-	add_action( 'add_attachment', __NAMESPACE__ . '\\begin_new_upload_optimization' );
+
+	/**
+	 * Restore optimization before WordPress resumes a failed upload in a later request.
+	 */
+	function restore_deferred_upload_optimization() {
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
+
+		if (
+			! $attachment_id
+			|| ! check_ajax_referer( 'media-form', '_wpnonce', false )
+			|| ! current_user_can( 'upload_files' )
+			|| '1' !== get_post_meta( $attachment_id, IMAGE_OPTIMIZATION_PENDING_META, true )
+		) {
+			return;
+		}
+
+		if ( ! wp_attachment_is_image( $attachment_id ) || 'image/jpeg' !== get_post_mime_type( $attachment_id ) ) {
+			delete_post_meta( $attachment_id, IMAGE_OPTIMIZATION_PENDING_META );
+			return;
+		}
+
+		remove_missing_size_metadata( $attachment_id );
+		activate_upload_optimization( $attachment_id );
+	}
+	add_action( 'wp_ajax_media-create-image-subsizes', __NAMESPACE__ . '\\restore_deferred_upload_optimization', 0 );
+
+	/**
+	 * Remove stale size records so WordPress can regenerate files that are missing.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 */
+	function remove_missing_size_metadata( $attachment_id ) {
+		$metadata      = wp_get_attachment_metadata( $attachment_id );
+		$attached_file = get_attached_file( $attachment_id );
+
+		if ( ! is_array( $metadata ) || empty( $metadata['sizes'] ) || ! $attached_file ) {
+			return;
+		}
+
+		$upload_dir = trailingslashit( dirname( $attached_file ) );
+		$changed    = false;
+
+		foreach ( $metadata['sizes'] as $size_name => $size_data ) {
+			if ( empty( $size_data['file'] ) || ! is_file( $upload_dir . wp_basename( $size_data['file'] ) ) ) {
+				unset( $metadata['sizes'][ $size_name ] );
+				$changed = true;
+			}
+		}
+
+		if ( $changed ) {
+			wp_update_attachment_metadata( $attachment_id, $metadata );
+		}
+	}
 
 	/**
 	 * Limit newly uploaded images to the approved longest-side dimension.
@@ -142,11 +209,57 @@ namespace Magazine_Core {
 	 * @return array
 	 */
 	function finish_new_upload_optimization( $metadata, $attachment_id, $context ) {
-		if ( 'create' === $context && active_upload_attachment() === (int) $attachment_id ) {
+		if (
+			in_array( $context, array( 'create', 'update' ), true )
+			&& active_upload_attachment() === (int) $attachment_id
+		) {
+			if (
+				'1' === get_post_meta( $attachment_id, IMAGE_OPTIMIZATION_PENDING_META, true )
+				&& attachment_metadata_files_exist( $attachment_id, $metadata )
+			) {
+				delete_post_meta( $attachment_id, IMAGE_OPTIMIZATION_PENDING_META );
+			}
+
 			stop_new_upload_optimization();
 		}
 
 		return $metadata;
+	}
+
+	/**
+	 * Verify that attachment metadata only advertises files present on disk.
+	 *
+	 * @param int   $attachment_id Attachment ID.
+	 * @param array $metadata Attachment metadata.
+	 * @return bool
+	 */
+	function attachment_metadata_files_exist( $attachment_id, $metadata ) {
+		$attached_file = get_attached_file( $attachment_id );
+
+		if ( ! is_array( $metadata ) || empty( $metadata['file'] ) || ! $attached_file || ! is_file( $attached_file ) ) {
+			return false;
+		}
+
+		$upload_dir = trailingslashit( dirname( $attached_file ) );
+
+		if (
+			! empty( $metadata['original_image'] )
+			&& ! is_file( $upload_dir . wp_basename( $metadata['original_image'] ) )
+		) {
+			return false;
+		}
+
+		foreach ( $metadata['sizes'] ?? array() as $size_data ) {
+			if ( empty( $size_data['file'] ) || ! is_file( $upload_dir . wp_basename( $size_data['file'] ) ) ) {
+				return false;
+			}
+		}
+
+		if ( function_exists( 'wp_get_missing_image_subsizes' ) && wp_get_missing_image_subsizes( $attachment_id ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/** Remove all request-scoped optimization filters. */
