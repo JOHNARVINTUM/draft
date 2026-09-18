@@ -25,4 +25,5 @@ require_once MAGAZINE_CORE_PATH . 'includes/media.php';
 require_once MAGAZINE_CORE_PATH . 'includes/authors.php';
 require_once MAGAZINE_CORE_PATH . 'includes/navigation.php';
 require_once MAGAZINE_CORE_PATH . 'includes/issues.php';
+require_once MAGAZINE_CORE_PATH . 'includes/magazines.php';
 

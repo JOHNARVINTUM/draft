@@ -19,6 +19,13 @@ $draft_issues = get_posts(
 );
 
 if ( ! $draft_issues ) {
+	?>
+	<section class="draft-home-new-covers">
+		<div class="draft-home-covers-inner">
+			<?php draft_theme_render_content_empty_state( 'cover' ); ?>
+		</div>
+	</section>
+	<?php
 	return;
 }
 

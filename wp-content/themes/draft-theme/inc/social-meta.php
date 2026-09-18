@@ -38,7 +38,7 @@ function draft_theme_get_social_description( $post ) {
  * Output one Open Graph and Twitter card metadata set for singular DRAFT content.
  */
 function draft_theme_output_social_metadata() {
-	if ( draft_theme_has_external_social_metadata_owner() || ! is_singular( array( 'post', 'magazine_issue' ) ) ) {
+	if ( draft_theme_has_external_social_metadata_owner() || ! is_singular( array( 'post', 'magazine_issue', 'magazine' ) ) ) {
 		return;
 	}
 

@@ -59,6 +59,8 @@ $draft_logo = DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
 					</a>
 				<?php endwhile; ?>
 			</div>
+		<?php else : ?>
+			<?php draft_theme_render_content_empty_state( 'article' ); ?>
 		<?php endif; ?>
 		<?php wp_reset_postdata(); ?>
 	</div>

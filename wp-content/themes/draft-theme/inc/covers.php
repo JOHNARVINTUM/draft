@@ -1,6 +1,6 @@
 <?php
 /**
- * DRAFT cover priority management and ordering.
+ * DRAFT Cover priority management and ordering.
  *
  * @package Draft_Theme
  */
@@ -82,7 +82,7 @@ add_action( 'save_post_magazine_issue', 'draft_theme_save_cover_priority' );
  * @return array
  */
 function draft_theme_get_cover_query_args( $args = array() ) {
-	return wp_parse_args(
+	$query_args = wp_parse_args(
 		$args,
 		array(
 			'post_type'                   => 'magazine_issue',
@@ -91,10 +91,12 @@ function draft_theme_get_cover_query_args( $args = array() ) {
 			'suppress_filters'            => false,
 		)
 	);
+
+	return $query_args;
 }
 
 /**
- * Apply priority ordering only to opt-in DRAFT Cover queries.
+ * Apply priority ordering only to DRAFT Cover queries.
  *
  * Unprioritized Covers sort after every positive priority. Duplicate or
  * missing priorities use post ID ascending as the deterministic tie-breaker.

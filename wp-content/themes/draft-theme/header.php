@@ -47,7 +47,7 @@ if ( ! function_exists( 'draft_theme_is_primary_nav_item_active' ) ) {
 			case 'covers':
 				return is_page( 'covers' ) || 0 === strpos( $current_path, '/covers/' );
 			case 'magazines':
-				return is_page( 'magazines' ) || is_singular( 'magazine_issue' ) || 0 === strpos( $current_path, '/magazines/' );
+				return is_page( 'magazines' ) || is_singular( 'magazine' ) || 0 === strpos( $current_path, '/magazines/' );
 			case 'articles':
 				return is_page( 'articles' ) || is_singular( 'post' ) || is_category() || 0 === strpos( $current_path, '/articles/' );
 			case 'about':
@@ -78,10 +78,10 @@ $draft_header_search_articles = get_posts(
     )
 );
 
-$draft_header_search_issues = post_type_exists( 'magazine_issue' )
+$draft_header_search_issues = post_type_exists( 'magazine' )
     ? get_posts(
         array(
-            'post_type'      => 'magazine_issue',
+            'post_type'      => 'magazine',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'orderby'        => 'date',
@@ -140,7 +140,7 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
 			<form class="draft-mobile-search__form" action="<?php echo esc_url( draft_theme_get_article_archive_url() ); ?>" method="get" data-draft-global-search-form>
 				<label for="draft-mobile-search-input"><?php esc_html_e( 'Search DRAFT', 'draft-theme' ); ?></label>
 				<div class="draft-mobile-search__field">
-					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Search Articles, Covers, Magazines...', 'draft-theme' ); ?>" autocomplete="off" data-draft-global-search-input>
+					<input id="draft-mobile-search-input" type="search" name="search" placeholder="<?php esc_attr_e( 'Search Articles, Magazines...', 'draft-theme' ); ?>" autocomplete="off" data-draft-global-search-input>
 					<button type="submit" aria-label="<?php esc_attr_e( 'Submit search', 'draft-theme' ); ?>">
 						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 5 5"></path></svg>
 					</button>
@@ -177,8 +177,8 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
 
     <?php foreach ( $draft_header_search_issues as $draft_search_index => $draft_search_issue ) : ?>
         <?php
-        $draft_search_issue_data = function_exists( 'magazine_core_get_magazine_issue' )
-            ? magazine_core_get_magazine_issue( $draft_search_issue )
+        $draft_search_issue_data = function_exists( 'magazine_core_get_magazine' )
+            ? magazine_core_get_magazine( $draft_search_issue )
             : null;
 
         if ( ! $draft_search_issue_data ) {
@@ -189,30 +189,10 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
             wp_strip_all_tags(
                 $draft_search_issue->post_title . ' ' .
                 get_the_excerpt( $draft_search_issue ) . ' ' .
-                $draft_search_issue_data['issue_label'] . ' ' .
-                $draft_search_issue_data['subtitle'] . ' magazine cover'
+                get_the_author_meta( 'display_name', (int) $draft_search_issue->post_author ) . ' magazine'
             )
         );
         ?>
-
-        <div
-            class="draft-global-search-item"
-            data-draft-global-search-card
-            data-result-label="Cover"
-            data-search-text="<?php echo esc_attr( $draft_search_issue_text ); ?>"
-        >
-            <?php
-            get_template_part(
-                'template-parts/covers/cover-card',
-                null,
-                array(
-                    'issue' => $draft_search_issue,
-                    'index' => $draft_search_index,
-                    'logo'  => $logo_url,
-                )
-            );
-            ?>
-        </div>
 
         <div
             class="draft-global-search-item"
@@ -225,9 +205,10 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
                 'template-parts/magazines/issue-card',
                 null,
                 array(
-                    'issue' => $draft_search_issue,
-                    'index' => $draft_search_index,
-                    'logo'  => $logo_url,
+					'issue'         => $draft_search_issue,
+					'index'         => $draft_search_index,
+					'logo'          => $logo_url,
+					'search_result' => true,
                 )
             );
             ?>
@@ -239,7 +220,7 @@ $draft_header_search_issues = post_type_exists( 'magazine_issue' )
     <span class="draft-articles-empty__icon" aria-hidden="true"></span>
     <h2 class="draft-articles-empty__title">No results found</h2>
     <p class="draft-articles-empty__message" data-draft-global-search-empty-message>
-        We couldn’t find any articles, covers, or magazines matching your search.
+        We couldn’t find any articles or magazines matching your search.
     </p>
     <button class="draft-articles-empty__clear" type="button" data-draft-global-search-clear>
         Clear Search

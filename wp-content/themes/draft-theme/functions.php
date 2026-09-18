@@ -36,3 +36,26 @@ function draft_theme_get_social_icon( $name ) {
 
 	return $icons[ $name ] ?? '';
 }
+
+/**
+ * Render an editorial empty state for a DRAFT content type.
+ *
+ * @param string $content_type Article, magazine, or cover.
+ */
+function draft_theme_render_content_empty_state( $content_type ) {
+	$headings = array(
+		'article'  => __( 'No articles yet.', 'draft-theme' ),
+		'magazine' => __( 'No magazine issues yet.', 'draft-theme' ),
+		'cover'    => __( 'No covers yet.', 'draft-theme' ),
+	);
+
+	if ( ! isset( $headings[ $content_type ] ) ) {
+		return;
+	}
+	?>
+	<div class="draft-content-empty draft-content-empty--<?php echo esc_attr( $content_type ); ?>">
+		<h2><?php echo esc_html( $headings[ $content_type ] ); ?></h2>
+		<p><?php esc_html_e( 'More from DRAFT is coming soon. Stay tuned.', 'draft-theme' ); ?></p>
+	</div>
+	<?php
+}

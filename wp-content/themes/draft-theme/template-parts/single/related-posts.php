@@ -28,12 +28,11 @@ if ( 'cover' === $draft_content_type ) {
 } elseif ( ! $draft_is_article ) {
 	$draft_related = get_posts(
 		array(
-			'post_type'      => 'magazine_issue',
+			'post_type'      => 'magazine',
 			'post_status'    => 'publish',
 			'posts_per_page' => 3,
 			'post__not_in'   => array( $draft_current_id ),
-			'meta_key'       => '_magazine_core_issue_number',
-			'orderby'        => 'meta_value_num',
+			'orderby'        => 'date',
 			'order'          => 'DESC',
 			'no_found_rows'  => true,
 		)
@@ -83,8 +82,8 @@ if ( empty( $draft_related ) ) {
 					continue;
 				}
 				$draft_media  = function_exists( 'magazine_core_get_post_media' ) ? magazine_core_get_post_media( $draft_related_post->ID, 'large' ) : array();
-				$draft_author = $draft_is_article && function_exists( 'magazine_core_get_author_profile' ) ? magazine_core_get_author_profile( (int) get_post_field( 'post_author', $draft_related_post->ID ) ) : array();
-				$draft_issue  = ! $draft_is_article && function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_related_post ) : null;
+				$draft_author = 'cover' !== $draft_content_type && function_exists( 'magazine_core_get_author_profile' ) ? magazine_core_get_author_profile( (int) get_post_field( 'post_author', $draft_related_post->ID ) ) : array();
+				$draft_issue  = 'cover' === $draft_content_type && function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_related_post ) : null;
 				$draft_url    = function_exists( 'draft_theme_get_contextual_content_url' ) ? draft_theme_get_contextual_content_url( $draft_related_post, $draft_content_type ) : get_permalink( $draft_related_post );
 				?>
 				<a class="draft-related-final-card" href="<?php echo esc_url( $draft_url ); ?>">
@@ -99,10 +98,10 @@ if ( empty( $draft_related ) ) {
 					</figure>
 					<h3><?php echo esc_html( get_the_title( $draft_related_post ) ); ?></h3>
 					<p class="draft-related-final-card__byline">
-						<?php if ( $draft_is_article ) : ?>
+						<?php if ( 'cover' !== $draft_content_type ) : ?>
 							<?php
 							printf(
-								/* translators: %s: Article author name. */
+								/* translators: %s: Content author name. */
 								esc_html__( 'by %s', 'draft-theme' ),
 								esc_html( $draft_author['name'] ?? get_the_author_meta( 'display_name', (int) get_post_field( 'post_author', $draft_related_post->ID ) ) )
 							);

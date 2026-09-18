@@ -11,14 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $draft_issue = $args['issue'] ?? null;
 $draft_index = isset( $args['index'] ) ? (int) $args['index'] : 0;
-$draft_logo  = $args['logo'] ?? DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
-$draft_data  = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issue ) : null;
+$draft_logo             = $args['logo'] ?? DRAFT_THEME_URI . '/assets/images/draft-logo-green.png';
+$draft_is_search_result = ! empty( $args['search_result'] );
+$draft_data             = function_exists( 'magazine_core_get_magazine' ) ? magazine_core_get_magazine( $draft_issue ) : null;
 
 if ( ! $draft_data ) {
 	return;
 }
 
-$draft_cover_id = (int) $draft_data['cover_image_id'];
+$draft_cover_id = (int) $draft_data['image_id'];
 $draft_alt      = sprintf(
 	/* translators: %s: magazine issue title. */
 	__( '%s cover', 'draft-theme' ),
@@ -42,14 +43,20 @@ $draft_alt      = sprintf(
 				);
 				?>
 			<?php else : ?>
-				<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_data['issue_label'] ?: $draft_data['title'] ); ?></span>
+				<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_data['title'] ); ?></span>
 			<?php endif; ?>
 			<span class="draft-magazine-final-card__shade" aria-hidden="true"></span>
 			<img class="draft-magazine-final-card__logo" src="<?php echo esc_url( $draft_logo ); ?>" alt="<?php esc_attr_e( 'draft', 'draft-theme' ); ?>">
 		</figure>
 		<h3><?php echo esc_html( $draft_data['title'] ); ?></h3>
-		<?php if ( $draft_data['subtitle'] ) : ?>
-			<p><?php echo esc_html( $draft_data['subtitle'] ); ?></p>
+		<?php if ( $draft_is_search_result ) : ?>
+			<p><?php echo esc_html( $draft_data['publication_date'] ); ?></p>
+			<?php if ( has_excerpt( $draft_data['post'] ) ) : ?>
+				<p><?php echo esc_html( wp_trim_words( get_the_excerpt( $draft_data['post'] ), 18, '...' ) ); ?></p>
+			<?php endif; ?>
+		<?php endif; ?>
+		<?php if ( ! $draft_is_search_result && $draft_data['description'] ) : ?>
+			<p><?php echo esc_html( $draft_data['description'] ); ?></p>
 		<?php endif; ?>
 	</a>
 </article>

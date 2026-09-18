@@ -1,6 +1,6 @@
 <?php
 /**
- * Shared magazine issue content model.
+ * Shared Cover content model.
  *
  * @package Magazine_Core
  */
@@ -17,23 +17,23 @@ const ISSUE_META_TYPE              = '_magazine_core_issue_type';
 const ISSUE_META_FEATURED_POST_IDS = '_magazine_core_featured_article_ids';
 
 /**
- * Register magazine issue post type.
+ * Register the existing Cover post type.
  */
 function register_magazine_issue_post_type() {
 	$labels = array(
-		'name'                  => _x( 'Magazine Issues', 'post type general name', 'magazine-core' ),
-		'singular_name'         => _x( 'Magazine Issue', 'post type singular name', 'magazine-core' ),
-		'menu_name'             => _x( 'Magazine Issues', 'admin menu', 'magazine-core' ),
-		'name_admin_bar'        => _x( 'Magazine Issue', 'add new on admin bar', 'magazine-core' ),
-		'add_new'               => _x( 'Add New', 'magazine issue', 'magazine-core' ),
-		'add_new_item'          => __( 'Add New Magazine Issue', 'magazine-core' ),
-		'new_item'              => __( 'New Magazine Issue', 'magazine-core' ),
-		'edit_item'             => __( 'Edit Magazine Issue', 'magazine-core' ),
-		'view_item'             => __( 'View Magazine Issue', 'magazine-core' ),
-		'all_items'             => __( 'All Magazine Issues', 'magazine-core' ),
-		'search_items'          => __( 'Search Magazine Issues', 'magazine-core' ),
-		'not_found'             => __( 'No magazine issues found.', 'magazine-core' ),
-		'not_found_in_trash'    => __( 'No magazine issues found in Trash.', 'magazine-core' ),
+		'name'                  => _x( 'Covers', 'post type general name', 'magazine-core' ),
+		'singular_name'         => _x( 'Cover', 'post type singular name', 'magazine-core' ),
+		'menu_name'             => _x( 'Covers', 'admin menu', 'magazine-core' ),
+		'name_admin_bar'        => _x( 'Cover', 'add new on admin bar', 'magazine-core' ),
+		'add_new'               => _x( 'Add New', 'cover', 'magazine-core' ),
+		'add_new_item'          => __( 'Add New Cover', 'magazine-core' ),
+		'new_item'              => __( 'New Cover', 'magazine-core' ),
+		'edit_item'             => __( 'Edit Cover', 'magazine-core' ),
+		'view_item'             => __( 'View Cover', 'magazine-core' ),
+		'all_items'             => __( 'All Covers', 'magazine-core' ),
+		'search_items'          => __( 'Search Covers', 'magazine-core' ),
+		'not_found'             => __( 'No covers found.', 'magazine-core' ),
+		'not_found_in_trash'    => __( 'No covers found in Trash.', 'magazine-core' ),
 		'featured_image'        => __( 'Cover Image', 'magazine-core' ),
 		'set_featured_image'    => __( 'Set cover image', 'magazine-core' ),
 		'remove_featured_image' => __( 'Remove cover image', 'magazine-core' ),
@@ -46,13 +46,14 @@ function register_magazine_issue_post_type() {
 			'labels'             => $labels,
 			'public'             => true,
 			'publicly_queryable' => true,
+			'exclude_from_search' => true,
 			'show_ui'            => true,
 			'show_in_menu'       => true,
 			'show_in_rest'       => true,
 			'menu_position'      => 21,
 			'menu_icon'          => 'dashicons-book-alt',
 			'query_var'          => true,
-			'rewrite'            => array( 'slug' => 'magazines' ),
+			'rewrite'            => array( 'slug' => 'covers' ),
 			'capability_type'    => 'post',
 			'has_archive'        => false,
 			'hierarchical'       => false,

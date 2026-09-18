@@ -166,11 +166,12 @@ if ( ! function_exists( 'draft_theme_get_cover_summary' ) ) {
 					</div>
 				</div>
 			<?php else : ?>
-				<p class="draft-covers-empty"><?php esc_html_e( 'No covers are available yet.', 'draft-theme' ); ?></p>
+				<?php draft_theme_render_content_empty_state( 'cover' ); ?>
 			<?php endif; ?>
 		</div>
 	</section>
 
+	<?php if ( $draft_issues ) : ?>
 	<section class="draft-covers-final__previous" aria-labelledby="draft-covers-previous-title">
 		<div class="draft-covers-final__inner">
 			<div class="draft-covers-final__heading">
@@ -178,8 +179,7 @@ if ( ! function_exists( 'draft_theme_get_cover_summary' ) ) {
 				<span aria-hidden="true"></span>
 			</div>
 
-			<?php if ( $draft_issues ) : ?>
-				<div class="draft-covers-previous-grid">
+			<div class="draft-covers-previous-grid">
 					<?php foreach ( $draft_issues as $draft_issue_index => $draft_issue ) : ?>
 						<?php
 						get_template_part(
@@ -193,12 +193,10 @@ if ( ! function_exists( 'draft_theme_get_cover_summary' ) ) {
 						);
 						?>
 					<?php endforeach; ?>
-				</div>
-			<?php else : ?>
-				<p class="draft-covers-empty"><?php esc_html_e( 'No covers are available yet.', 'draft-theme' ); ?></p>
-			<?php endif; ?>
+			</div>
 		</div>
 	</section>
+	<?php endif; ?>
 </section>
 <?php
 wp_reset_postdata();

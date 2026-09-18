@@ -15,11 +15,10 @@ get_header();
 
 $draft_issue_query = new WP_Query(
 	array(
-		'post_type'      => 'magazine_issue',
+		'post_type'      => 'magazine',
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
-		'meta_key'       => '_magazine_core_issue_number',
-		'orderby'        => 'meta_value_num',
+		'orderby'        => 'date',
 		'order'          => 'DESC',
 		'no_found_rows'  => true,
 	)
@@ -58,12 +57,12 @@ if ( ! function_exists( 'draft_theme_get_magazine_issue_description' ) ) {
 			<div class="draft-magazines-final__cover-stage">
 				<?php foreach ( $draft_issues as $draft_issue_index => $draft_issue ) : ?>
 					<?php
-					$draft_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issue ) : null;
+					$draft_data = function_exists( 'magazine_core_get_magazine' ) ? magazine_core_get_magazine( $draft_issue ) : null;
 					if ( ! $draft_data ) {
 						continue;
 					}
 
-					$draft_cover_id    = (int) $draft_data['cover_image_id'];
+					$draft_cover_id    = (int) $draft_data['image_id'];
 					$draft_description = draft_theme_get_magazine_issue_description( $draft_issue );
 					$draft_permalink   = get_permalink( $draft_issue );
 					$draft_alt         = sprintf(
@@ -78,7 +77,7 @@ if ( ! function_exists( 'draft_theme_get_magazine_issue_description' ) ) {
 						data-draft-magazines-slide
 						data-index="<?php echo esc_attr( (string) $draft_issue_index ); ?>"
 						data-title="<?php echo esc_attr( $draft_data['title'] ); ?>"
-						data-subtitle="<?php echo esc_attr( $draft_data['subtitle'] ); ?>"
+						data-subtitle="<?php echo esc_attr( $draft_data['publication_date'] ); ?>"
 						data-description="<?php echo esc_attr( $draft_description ); ?>"
 						data-url="<?php echo esc_url( $draft_permalink ); ?>"
 						aria-hidden="<?php echo 0 === $draft_issue_index ? 'false' : 'true'; ?>"
@@ -97,13 +96,11 @@ if ( ! function_exists( 'draft_theme_get_magazine_issue_description' ) ) {
 							);
 							?>
 						<?php else : ?>
-							<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_data['issue_label'] ?: $draft_data['title'] ); ?></span>
+							<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_data['title'] ); ?></span>
 						<?php endif; ?>
 						<span class="draft-magazines-final__cover-shade" aria-hidden="true"></span>
 						<img class="draft-magazines-final__cover-logo" src="<?php echo esc_url( $draft_logo ); ?>" alt="<?php esc_attr_e( 'draft', 'draft-theme' ); ?>">
-						<?php if ( $draft_data['issue_label'] ) : ?>
-							<span class="draft-magazines-final__issue-label"><?php echo esc_html( $draft_data['issue_label'] ); ?></span>
-						<?php endif; ?>
+						<span class="draft-magazines-final__issue-label"><?php echo esc_html( $draft_data['publication_date'] ); ?></span>
 					</a>
 				<?php endforeach; ?>
 			</div>
@@ -116,16 +113,12 @@ if ( ! function_exists( 'draft_theme_get_magazine_issue_description' ) ) {
 
 			<?php
 			$draft_first_issue = $draft_issues[0];
-			$draft_first_data  = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_first_issue ) : null;
+			$draft_first_data  = function_exists( 'magazine_core_get_magazine' ) ? magazine_core_get_magazine( $draft_first_issue ) : null;
 			?>
 			<?php if ( $draft_first_data ) : ?>
 				<a class="draft-magazines-final__intro" href="<?php echo esc_url( get_permalink( $draft_first_issue ) ); ?>" data-draft-magazines-current-link>
 					<h2 data-draft-magazines-current-title><?php echo esc_html( $draft_first_data['title'] ); ?></h2>
-					<?php if ( $draft_first_data['subtitle'] ) : ?>
-						<p class="draft-magazines-final__subtitle" data-draft-magazines-current-subtitle><?php echo esc_html( $draft_first_data['subtitle'] ); ?></p>
-					<?php else : ?>
-						<p class="draft-magazines-final__subtitle" data-draft-magazines-current-subtitle></p>
-					<?php endif; ?>
+					<p class="draft-magazines-final__subtitle" data-draft-magazines-current-subtitle><?php echo esc_html( $draft_first_data['publication_date'] ); ?></p>
 					<p class="draft-magazines-final__description" data-draft-magazines-current-description><?php echo esc_html( draft_theme_get_magazine_issue_description( $draft_first_issue ) ); ?></p>
 					<span class="draft-magazines-final__cta">
 						<?php esc_html_e( 'Read Full Issue', 'draft-theme' ); ?>
@@ -164,7 +157,7 @@ if ( ! function_exists( 'draft_theme_get_magazine_issue_description' ) ) {
 			</div>
 		</section>
 	<?php else : ?>
-		<p class="draft-magazines-empty"><?php esc_html_e( 'No magazine issues are available yet.', 'draft-theme' ); ?></p>
+		<?php draft_theme_render_content_empty_state( 'magazine' ); ?>
 	<?php endif; ?>
 </section>
 <?php

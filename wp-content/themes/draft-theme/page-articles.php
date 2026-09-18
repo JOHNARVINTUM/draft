@@ -26,6 +26,7 @@ if ( $draft_selected_category instanceof WP_Term ) {
 }
 
 if ( '' !== $draft_search_query ) {
+	$draft_query_args['post_type'] = array( 'post', 'magazine' );
 	$draft_query_args['s'] = $draft_search_query;
 }
 
@@ -105,7 +106,21 @@ $draft_featured = get_posts(
 				<div class="draft-articles-grid" data-draft-articles-grid>
 					<?php while ( $draft_articles->have_posts() ) : ?>
 						<?php $draft_articles->the_post(); ?>
-						<?php get_template_part( 'template-parts/articles/article-card' ); ?>
+						<?php if ( 'magazine' === get_post_type() ) : ?>
+							<?php
+							get_template_part(
+								'template-parts/magazines/issue-card',
+								null,
+								array(
+									'issue'         => get_post(),
+									'index'         => (int) $draft_articles->current_post,
+									'search_result' => true,
+								)
+							);
+							?>
+						<?php else : ?>
+							<?php get_template_part( 'template-parts/articles/article-card' ); ?>
+						<?php endif; ?>
 					<?php endwhile; ?>
 				</div>
 
@@ -132,7 +147,11 @@ $draft_featured = get_posts(
 					<nav class="draft-pagination" aria-label="<?php esc_attr_e( 'Articles pagination', 'draft-theme' ); ?>"><?php echo wp_kses_post( $draft_pagination ); ?></nav>
 				<?php endif; ?>
 			<?php else : ?>
-				<div class="draft-articles-empty"><?php esc_html_e( 'No articles found.', 'draft-theme' ); ?></div>
+				<?php if ( '' !== $draft_search_query ) : ?>
+					<div class="draft-articles-empty"><?php esc_html_e( 'No articles or magazines found.', 'draft-theme' ); ?></div>
+				<?php else : ?>
+					<?php draft_theme_render_content_empty_state( 'article' ); ?>
+				<?php endif; ?>
 			<?php endif; ?>
 			<?php wp_reset_postdata(); ?>
 		</section>
@@ -140,4 +159,3 @@ $draft_featured = get_posts(
 </section>
 <?php
 get_footer();
-

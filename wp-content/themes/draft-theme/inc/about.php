@@ -62,7 +62,7 @@ function draft_theme_get_about_image( $post_id, $position ) {
  * Return the five effective lower-strip images.
  *
  * Unsaved fields retain the exact legacy composition: the optional legacy
- * bottom image followed by issue covers ordered by issue number.
+ * bottom image followed by eligible Covers ordered by Cover priority.
  *
  * @param int $post_id About page ID.
  * @return array<int, array{id: int, alt: string, is_set: bool}>
@@ -79,14 +79,13 @@ function draft_theme_get_about_bottom_images( $post_id ) {
 	}
 
 	$issues = get_posts(
-		array(
-			'post_type'      => 'magazine_issue',
-			'post_status'    => 'publish',
-			'posts_per_page' => 5,
-			'meta_key'       => '_magazine_core_issue_number',
-			'orderby'        => 'meta_value_num',
-			'order'          => 'DESC',
-			'no_found_rows'  => true,
+		draft_theme_get_cover_query_args(
+			array(
+				'post_type'      => 'magazine_issue',
+				'post_status'    => 'publish',
+				'posts_per_page' => 5,
+				'no_found_rows'  => true,
+			)
 		)
 	);
 

@@ -792,7 +792,7 @@ document.addEventListener("click", function (event) {
 
         if (hasNoResults && emptyMessage) {
             emptyMessage.textContent =
-                'We couldn’t find any articles, covers, or magazines matching “' +
+                'We couldn’t find any articles or magazines matching “' +
                 input.value.trim() +
                 '”.';
         }

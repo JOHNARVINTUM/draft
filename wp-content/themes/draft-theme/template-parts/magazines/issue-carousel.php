@@ -21,12 +21,12 @@ $draft_issues = isset( $args['issues'] ) && is_array( $args['issues'] ) ? $args[
 			<div class="draft-magazine-carousel__stack">
 				<?php foreach ( $draft_issues as $draft_index => $draft_issue ) : ?>
 					<?php
-					$draft_issue_data = function_exists( 'magazine_core_get_magazine_issue' ) ? magazine_core_get_magazine_issue( $draft_issue ) : null;
+					$draft_issue_data = function_exists( 'magazine_core_get_magazine' ) ? magazine_core_get_magazine( $draft_issue ) : null;
 					if ( ! $draft_issue_data ) {
 						continue;
 					}
 
-					$draft_cover_id = (int) $draft_issue_data['cover_image_id'];
+					$draft_cover_id = (int) $draft_issue_data['image_id'];
 					$draft_alt      = sprintf(
 						/* translators: %s: magazine issue title. */
 						__( '%s cover', 'draft-theme' ),
@@ -47,7 +47,7 @@ $draft_issues = isset( $args['issues'] ) && is_array( $args['issues'] ) ? $args[
 							);
 							?>
 						<?php else : ?>
-							<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_issue_data['issue_label'] ?: $draft_issue_data['title'] ); ?></span>
+							<span class="draft-magazine-cover-placeholder"><?php echo esc_html( $draft_issue_data['title'] ); ?></span>
 						<?php endif; ?>
 					</div>
 				<?php endforeach; ?>
